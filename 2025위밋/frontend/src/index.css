@@ -1,0 +1,17 @@
+/* Tailwind entry CSS - imported by src entry (index.js)
+   This file ensures Tailwind's base/components/utilities are processed
+   by PostCSS during development and build. */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* You can add project-specific global styles below */
+:root {
+  --wemeet-primary: #0ea5e9;
+}
+
+/* Example utility override */
+body {
+  @apply bg-white text-slate-900;
+}
