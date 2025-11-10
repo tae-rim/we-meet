@@ -1,0 +1,187 @@
+/* src/styles/Dashboard2.css */
+
+/* 메인 콘텐츠 (밝은 배경) */
+.dashboard-content-light {
+    width: 100%;
+    min-height: calc(100vh - var(--header-height));
+    background-color: #ffffff;
+    padding: 2.5rem 3rem; /* 콘텐츠 영역 내부 여백 */
+    overflow-y: auto; /* 내용 길어지면 스크롤 */
+  }
+  
+  .dashboard-section {
+    width: 100%;
+    margin-bottom: 3rem; /* 섹션 사이 간격 */
+  }
+  
+  /* 1. 통계 지표 섹션 */
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  .section-header h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-color);
+  }
+  
+  .export-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background-color: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-medium);
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  .export-button:hover {
+    background-color: #f9f9f9;
+  }
+  .export-button svg {
+    fill: var(--text-light);
+  }
+  
+  /* 1-1. 통계 박스 */
+  .stat-boxes-container {
+    display: grid;
+    /* 3열 그리드, 1fr: 동일한 비율로 3칸 */
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 1.5rem; /* 박스 사이 간격 */
+  }
+  
+  .stat-box {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+  }
+  
+  .stat-box p {
+    font-size: 0.9rem;
+    color: var(--text-light);
+    margin-bottom: 0.5rem;
+  }
+  
+  .stat-box h3 {
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: var(--text-color);
+  }
+  
+  .stat-box h3 span {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--text-medium);
+    margin-left: 0.25rem;
+  }
+  
+  /* 1-2. 차트 */
+  .charts-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* 2열 그리드 */
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+  }
+  
+  .chart-box {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+  }
+  .chart-box img {
+    width: 100%;
+    height: auto;
+  }
+  
+  
+  /* 2. 지원자 순위 섹션 */
+  .applicant-list-container {
+    display: flex;
+    gap: 2.5rem; /* 두 열(column) 사이 간격 */
+  }
+  
+  .applicant-list-column {
+    flex: 1; /* 1:1 비율로 공간 차지 */
+    min-width: 0;
+  }
+  
+  /* 2-1. 지원자 리스트 헤더 (공통) */
+  .applicant-row-header {
+    display: grid;
+    /* 5칸 그리드 (비율 조정) */
+    grid-template-columns: 60px 100px 1fr 100px 80px;
+    gap: 1rem;
+    
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid var(--border-color);
+    
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-light);
+  }
+  .applicant-row-header span:last-child {
+    text-align: center;
+  }
+  
+  /* 2-2. 지원자 리스트 한 줄 (공통) */
+  .applicant-row {
+    display: grid;
+    /* 헤더와 동일한 5칸 그리드 */
+    grid-template-columns: 60px 100px 1fr 100px 80px;
+    gap: 1rem;
+    align-items: center;
+  
+    padding: 1rem 1rem;
+    border-bottom: 1px solid #F0F0F0; /* 더 연한 구분선 */
+    font-size: 0.9rem;
+  }
+  
+  .applicant-row .rank {
+    font-weight: 700;
+    color: var(--text-color);
+  }
+  .applicant-row .name {
+    font-weight: 600;
+    color: var(--text-color);
+  }
+  .applicant-row .score {
+    font-weight: 600;
+    color: var(--text-medium);
+  }
+  
+  /* 직무 태그 (Back-End, Front-End) */
+  .job-tag {
+    display: inline-block;
+    padding: 0.25rem 0.6rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 4px;
+    text-align: center;
+  }
+  .job-tag-backend {
+    color: #D9534F; /* (예시) 붉은 계열 */
+    background-color: #FDF2F2;
+  }
+  .job-tag-frontend {
+    color: #4A90E2; /* (예시) 푸른 계열 */
+    background-color: #F0F5FC;
+  }
+  
+  .link-arrow {
+    text-align: center;
+    color: var(--text-light);
+    font-size: 1.25rem;
+    line-height: 1;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .link-arrow:hover {
+    color: var(--primary-color);
+  }

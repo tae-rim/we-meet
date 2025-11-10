@@ -1,0 +1,31 @@
+/* src/styles/globals.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Reset / 기본 설정 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* 전역 body */
+body {
+  font-family: 'Pretendard', sans-serif;
+  background-color: #f8f8f8; /* Dashboard, Upload 등 공통 배경 */
+  color: #111111; /* 기본 텍스트 색상 */
+}
+
+/* 공통 버튼 스타일 (선택적으로) */
+button {
+  font-family: 'Pretendard', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  outline: none;
+}
+
+/* 공통 입력 스타일 */
+input {
+  font-family: 'Pretendard', sans-serif;
+}

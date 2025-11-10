@@ -1,0 +1,113 @@
+/* src/styles/Dashboard4.css */
+
+/* 1. 메인 콘텐츠 (밝은 배경) */
+.dashboard-content-light {
+    width: 100%;
+    min-height: calc(100vh - var(--header-height));
+    background-color: #ffffff;
+    padding: 2.5rem 3rem; /* 콘텐츠 영역 내부 여백 */
+    overflow-y: auto;
+  }
+  
+  /* 2. 3단 레이아웃 (A슬롯, B슬롯, 목록) */
+  .dashboard4-layout {
+    display: flex;
+    gap: 2rem; /* 컬럼 사이 간격 */
+    
+    /* 페이지 높이를 꽉 채우기 (패딩값 제외)
+      Header/Sidebar와 높이를 맞춥니다.
+    */
+    height: calc(100vh - var(--header-height) - 5rem); 
+  }
+  
+  /* 3. 비교 슬롯 (왼쪽, 중간) */
+  .comparison-slot {
+    flex: 1; /* 1:1 비율로 남은 공간 차지 */
+    background-color: #ffffff;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04); /* 캡쳐의 은은한 그림자 */
+    border-radius: 12px;
+    
+    /* 텍스트 중앙 정렬 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    color: var(--text-light);
+    font-size: 0.9rem;
+    font-weight: 500;
+    
+    height: 100%; /* 부모 높이(layout) 꽉 채움 */
+  }
+  
+  /* 4. 지원자 목록 패널 (오른쪽) */
+  .applicant-list-panel {
+    flex-basis: 300px; /* 고정 너비 */
+    flex-shrink: 0; /* 줄어들지 않음 */
+    
+    height: 100%; /* 부모 높이 꽉 채움 */
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .applicant-list-panel h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    /* 캡쳐의 초록색 제목 (메인 컬러) */
+    color: var(--primary-color); 
+    margin-bottom: 1.5rem;
+    padding-left: 0.5rem;
+  }
+  
+  /* 4-1. 스크롤되는 목록 영역 */
+  .applicant-list-sidebar {
+    flex-grow: 1; /* 남은 높이 모두 차지 */
+    overflow-y: auto; /* 목록 길어지면 스크롤 */
+  }
+  
+  /* 4-2. 목록의 각 항목 */
+  .applicant-row-item {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 0.5rem;
+    border-bottom: 1px solid #F0F0F0; /* 연한 구분선 */
+  }
+  
+  .applicant-row-item .rank {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-light);
+    width: 30px; /* 순위 너비 고정 */
+  }
+  
+  .applicant-row-item .name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-color);
+    flex-grow: 1; /* 이름이 남은 공간 다 차지 */
+  }
+  
+  /* '+' 버튼 */
+  .add-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+  }
+  
+  /* '+' 아이콘 SVG 스타일 */
+  .add-button svg {
+    width: 16px;
+    height: 16px;
+    /* 캡쳐의 파란색 '+' 아이콘 */
+    fill: #4A90E2; 
+  }
+  
+  .add-button:hover {
+    background-color: #F0F5FC; /* 파란색의 연한 배경 */
+  }

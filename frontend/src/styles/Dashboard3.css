@@ -1,0 +1,116 @@
+/* src/styles/Dashboard3.css */
+
+/* 1. 메인 콘텐츠 (어두운 배경) */
+.dashboard-content-dark {
+    width: 100%;
+    height: calc(100vh - var(--header-height));
+    background-color: #1A1A1A; /* 어두운 배경색 */
+    
+    /* 내부 여백 */
+    padding: 2.5rem; 
+  }
+  
+  /* 2. 2단 레이아웃 (정보 패널 + 뷰어) */
+  .dashboard3-layout {
+    display: flex;
+    gap: 2.5rem; /* 두 컬럼 사이의 간격 */
+  }
+  
+  /* 3. 왼쪽 - 지원자 정보 패널 */
+  .applicant-info-panel {
+    flex-basis: 320px; /* 고정 너비 */
+    flex-shrink: 0; /* 줄어들지 않음 */
+    
+    background-color: #ffffff; /* 흰색 배경 */
+    border-radius: 8px;
+    padding: 2rem;
+    
+    /* (중요) 패널 높이를 뷰어와 맞추기 위해 */
+    /* 단, 이 방식은 뷰어보다 내용이 길어지면 깨지므로,
+       실제 구현 시에는 뷰어 높이에 맞춰 JS로 조절하거나
+       CSS Grid 사용을 고려할 수 있습니다.
+       지금은 캡쳐 기준으로 구현합니다. */
+    height: fit-content; 
+  }
+  
+  .applicant-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+  
+  .applicant-header h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-color);
+  }
+  
+  /* 3-1. 정보 박스 그리드 */
+  .info-box-grid {
+    display: grid;
+    grid-template-columns: 1fr; /* 1열 그리드 */
+    gap: 1rem;
+  }
+  
+  .info-box {
+    background-color: #F9F9F9;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 1.25rem 1.5rem;
+  }
+  
+  .info-box p {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-light);
+    margin-bottom: 0.5rem;
+  }
+  
+  .info-box .score {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-color);
+  }
+  
+  
+  /* 4. 오른쪽 - 이력서 뷰어 */
+  .resume-viewer {
+    flex-grow: 1; /* 남은 공간을 모두 차지 */
+    
+    background-color: #D9D9D9; /* 캡쳐의 연한 회색 */
+    border-radius: 8px;
+    
+    /* "이력서 원본" 텍스트 중앙 정렬 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    color: #505050;
+    font-size: 1.1rem;
+    font-weight: 600;
+  
+    /* (중요) 최소 높이를 확보해 패널이 찌그러지지 않게 함 */
+    min-height: 400px; 
+  }
+  
+  
+  /* (가져옴) Dashboard2.css의 직무 태그 스타일
+    여기에도 동일하게 필요합니다.
+  */
+  .job-tag {
+    display: inline-block;
+    padding: 0.25rem 0.6rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 4px;
+    text-align: center;
+  }
+  .job-tag-backend {
+    color: #D9534F;
+    background-color: #FDF2F2;
+  }
+  .job-tag-frontend {
+    color: #4A90E2;
+    background-color: #F0F5FC;
+  }
