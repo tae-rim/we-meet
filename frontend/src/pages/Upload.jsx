@@ -5,10 +5,31 @@ import Header from "../components/Header";
 import { PlusIcon, FileIcon, XIcon } from "../components/IconSet";
 import { useNavigate } from "react-router-dom";
 
+const SelectBox = ({ label, value, onChange, options }) => (
+  <div className="flex flex-col gap-2">
+    <label className="text-gray-700 font-semibold text-lg">{label}</label>
+    <select
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      className="w-full h-12 px-4 rounded-md border border-gray-300 bg-gray-100 
+                 focus:outline-none focus:ring-2 focus:ring-[#1AC0A4] focus:border-transparent"
+    >
+      <option value="">{label} 선택</option>
+      {options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+    </select>
+  </div>
+);
+
 export default function Upload({ isAnalyzing, setIsAnalyzing, setProgress }) {
   // --- State 정의 ---
   const [uploadedFiles, setUploadedFiles] = useState([]); // File 객체 배열
   const [criteria, setCriteria] = useState(""); // 인재상(채용 기준) 입력값
+  
+    // 2. 새로 추가된 Select Box state
+  const [job, setJob] = useState("");
+  const [degree, setDegree] = useState("");
+  const [license, setLicense] = useState("");
+  
   const navigate = useNavigate();
 
   // --- Dropzone 핸들러 ---
@@ -48,6 +69,15 @@ const handleAnalysisStart = () => {
     });
   }, 1000);
 };
+
+  // 3. 버튼 비활성화 로직 (새로운 state 3개 추가)
+  const isButtonDisabled = 
+    isAnalyzing || 
+    uploadedFiles.length === 0 || 
+    criteria.trim() === "" || 
+    job === "" || 
+    degree === "" || 
+    license === "";
 
   return (
     <div className="w-full min-h-screen bg-white">
@@ -131,32 +161,60 @@ const handleAnalysisStart = () => {
             )}
           </div>
 
-          {/* 인재상(채용 기준) 입력창 */}
-          <div className="flex flex-col gap-3">
-            <label className="text-gray-700 font-semibold text-lg">
-              채용 기준 (인재상)
-            </label>
-            <textarea
-              value={criteria}
-              onChange={(e) => setCriteria(e.target.value)}
-              placeholder="채용 기준을 입력해주세요"
-              className="w-full min-h-[10rem] p-4 border border-gray-300 rounded-lg 
-                         focus:outline-none focus:ring-2 focus:ring-[#1AC0A4] focus:border-transparent
-                         text-gray-700 placeholder-gray-400 resize-none"
-            />
+          {/* 4. ★ 레이아웃 수정: 필터(왼쪽) 및 인재상(오른쪽) 입력 영역 ★ */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+            
+            {/* 4-1. 왼쪽: 셀렉트 박스 3개 */}
+            <div className="flex flex-col gap-6">
+              <SelectBox 
+                label="직업" 
+                value={job} 
+                onChange={setJob} 
+                options={["Back-End", "Front-End", "AI/ML", "DevOps", "PM", "디자이너"]} 
+              />
+              <SelectBox 
+                label="학위" 
+                value={degree} 
+                onChange={setDegree} 
+                options={["학사", "석사", "박사", "고졸", "무관"]} 
+              />
+              <SelectBox 
+                label="자격증 (선택)" 
+                value={license} 
+                onChange={setLicense} 
+                options={["정보처리기사", "AWS", "SQLD", "해당 없음"]} 
+              />
+            </div>
+
+            {/* 4-2. 오른쪽: 인재상(채용 기준) 입력창 */}
+            <div className="flex flex-col gap-3">
+              <label className="text-gray-700 font-semibold text-lg">
+                채용 기준 (인재상)
+              </label>
+              <textarea
+                value={criteria}
+                onChange={(e) => setCriteria(e.target.value)}
+                placeholder="채용 기준을 입력해주세요"
+                className="w-full min-h-[22.5rem] p-4 border border-gray-300 rounded-lg 
+                           focus:outline-none focus:ring-2 focus:ring-[#1AC0A4] focus:border-transparent
+                           text-gray-700 placeholder-gray-400 resize-none"
+              />
+            </div>
           </div>
 
           {/* 5. 분석 시작하기 버튼 (상태에 따라 변경) */}
           <button
             onClick={handleAnalysisStart}
-            disabled={isAnalyzing || uploadedFiles.length === 0 || criteria.trim() === ""}
+            // ★ 수정된 부분 ★
+            disabled={isButtonDisabled}
             className={`w-full h-16 text-white text-lg font-bold rounded-lg transition-colors
                         ${
-                          isAnalyzing || uploadedFiles.length === 0 || criteria.trim() === ""
+                          isButtonDisabled
                             ? "bg-[#1AC0A4]/70 cursor-not-allowed"
+                            // 자격증(license)은 선택 안 해도 버튼 활성화
                             : "bg-[#1AC0A4] hover:bg-[#169a83]"
                         }`}
-          >
+                        >
             {isAnalyzing
               ? "분석 중입니다. 진행 상황은 Dashboard에서 확인하세요."
               : "분석 시작하기"}

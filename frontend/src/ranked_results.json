@@ -1,0 +1,156 @@
+[
+    {
+        "Rank":1,
+        "Job Applicant Name":"Ahu",
+        "Score":0.63321924,
+        "Job Roles":"Back-end",
+        "Resume":"Proficient in Java, Algorithms, Problem Solving, Software Development, Python, with senior-level experience in the field. Holds a PhD degree. Holds certifications such as Microsoft Certified: Azure Developer Associate. Skilled in delivering results and adapting to dynamic environments."
+    },
+    {
+        "Rank":2,
+        "Job Applicant Name":"Troels",
+        "Score":0.5973595,
+        "Job Roles":"Back-end",
+        "Resume":"Proficient in Software Development, Data Structures, Python, Java, Algorithms, with mid-level experience in the field. Holds a Bachelors degree. Holds certifications such as Oracle Java Certification. Skilled in delivering results and adapting to dynamic environments."
+    },
+    {
+        "Rank":3,
+        "Job Applicant Name":"Morteza",
+        "Score":0.59182096,
+        "Job Roles":"Back-end",
+        "Resume":"Proficient in Software Development, C++, Python, Git, Algorithms, with senior-level experience in the field. Holds a PhD degree. Holds certifications such as Oracle Java Certification. Skilled in delivering results and adapting to dynamic environments."
+    },
+    {
+        "Rank":4,
+        "Job Applicant Name":"Kgosi",
+        "Score":0.59053326,
+        "Job Roles":"Back-end",
+        "Resume":"Proficient in Algorithms, Agile, Problem Solving, Python, Software Development, with mid-level experience in the field. Holds a Bachelors degree. Holds certifications such as Microsoft Certified: Azure Developer Associate. Skilled in delivering results and adapting to dynamic environments."
+    },
+    {
+        "Rank":5,
+        "Job Applicant Name":"Heinrich",
+        "Score":0.5895483,
+        "Job Roles":"Back-end",
+        "Resume":"Proficient in Agile, C++, Problem Solving, Python, Algorithms, with senior-level experience in the field. Holds a PhD degree. Holds certifications such as Oracle Java Certification. Skilled in delivering results and adapting to dynamic environments."
+    },
+    {
+        "Rank":6,
+        "Job Applicant Name":"Hudha",
+        "Score":0.5881231,
+        "Job Roles":"Back-end",
+        "Resume":"Proficient in Algorithms, Java, Python, Unit Testing, Problem Solving, with mid-level experience in the field. Holds a Masters degree. Holds certifications such as AWS Certified Solutions Architect. Skilled in delivering results and adapting to dynamic environments."
+    },
+    {
+        "Rank":7,
+        "Job Applicant Name":"Rovsen",
+        "Score":0.5737776,
+        "Job Roles":"Back-end",
+        "Resume":"Proficient in Problem Solving, Software Development, Python, Unit Testing, Git, with senior-level experience in the field. Holds a Bachelors degree. Holds certifications such as Oracle Java Certification. Skilled in delivering results and adapting to dynamic environments."
+    },
+    {
+        "Rank":8,
+        "Job Applicant Name":"Farida",
+        "Score":0.56364626,
+        "Job Roles":"Back-end",
+        "Resume":"Proficient in Agile, Python, Problem Solving, Software Development, C++, with senior-level experience in the field. Holds a Bachelors degree. Holds certifications such as Certified Kubernetes Administrator. Skilled in delivering results and adapting to dynamic environments."
+    },
+    {
+        "Rank":9,
+        "Job Applicant Name":"Arezoo",
+        "Score":0.5362697,
+        "Job Roles":"Back-end",
+        "Resume":"Proficient in Git, Python, Algorithms, C++, Agile, with senior-level experience in the field. Holds a PhD degree. Holds certifications such as Oracle Java Certification. Skilled in delivering results and adapting to dynamic environments."
+    },
+    {
+        "Rank":10,
+        "Job Applicant Name":"Jeydy",
+        "Score":0.52626175,
+        "Job Roles":"Back-end",
+        "Resume":"Proficient in Algorithms, Java, Agile, Unit Testing, Problem Solving, with senior-level experience in the field. Holds a PhD degree. Holds certifications such as Certified Kubernetes Administrator. Skilled in delivering results and adapting to dynamic environments."
+    },
+    {
+        "Rank":11,
+        "Job Applicant Name":"Zoi",
+        "Score":0.5013611,
+        "Job Roles":"Back-end",
+        "Resume":"Proficient in Agile, Unit Testing, Software Development, Algorithms, C++, with senior-level experience in the field. Holds a PhD degree. Holds certifications such as Microsoft Certified: Azure Developer Associate. Skilled in delivering results and adapting to dynamic environments."
+    },
+    {
+        "Rank":12,
+        "Job Applicant Name":"Suzanne",
+        "Score":0.49417692,
+        "Job Roles":"Front-end",
+        "Resume":"Proficient in Unit Testing, Data Structures, Git, Java, Algorithms, with senior-level experience in the field. Holds a PhD degree. Holds certifications such as AWS Certified Solutions Architect. Skilled in delivering results and adapting to dynamic environments."
+    },
+    {
+        "Rank":13,
+        "Job Applicant Name":"Reham",
+        "Score":0.48465842,
+        "Job Roles":"Front-end",
+        "Resume":"Proficient in Git, Software Development, Java, Algorithms, Data Structures, with senior-level experience in the field. Holds a Masters degree. Holds certifications such as Google Cloud Professional Cloud Architect. Skilled in delivering results and adapting to dynamic environments."
+    },
+    {
+        "Rank":14,
+        "Job Applicant Name":"Tamar",
+        "Score":0.48185107,
+        "Job Roles":"Front-end",
+        "Resume":"Proficient in Data Structures, C++, Unit Testing, Java, Python, with senior-level experience in the field. Holds a Bachelors degree. Holds certifications such as Google Cloud Professional Cloud Architect. Skilled in delivering results and adapting to dynamic environments."
+    },
+    {
+        "Rank":15,
+        "Job Applicant Name":"Carmen Iris",
+        "Score":0.47917885,
+        "Job Roles":"Front-end",
+        "Resume":"Proficient in Agile, Git, Data Structures, Algorithms, C++, with senior-level experience in the field. Holds a Masters degree. Holds certifications such as Oracle Java Certification. Skilled in delivering results and adapting to dynamic environments."
+    },
+    {
+        "Rank":16,
+        "Job Applicant Name":"Ewan",
+        "Score":0.47680032,
+        "Job Roles":"Front-end",
+        "Resume":"Proficient in Unit Testing, Data Structures, Git, Java, Software Development, with senior-level experience in the field. Holds a PhD degree. Holds certifications such as Certified Kubernetes Administrator. Skilled in delivering results and adapting to dynamic environments."
+    },
+    {
+        "Rank":17,
+        "Job Applicant Name":"Charlot",
+        "Score":0.47441006,
+        "Job Roles":"Front-end",
+        "Resume":"Proficient in Data Structures, Software Development, Agile, Git, Problem Solving, with mid-level experience in the field. Holds a Masters degree. Holds certifications such as Google Cloud Professional Cloud Architect. Skilled in delivering results and adapting to dynamic environments."
+    },
+    {
+        "Rank":18,
+        "Job Applicant Name":"Diane Clarisse",
+        "Score":0.47379565,
+        "Job Roles":"Front-end",
+        "Resume":"Proficient in Unit Testing, Python, Data Structures, C++, Algorithms, with mid-level experience in the field. Holds a Bachelors degree. Holds certifications such as Google Cloud Professional Cloud Architect. Skilled in delivering results and adapting to dynamic environments."
+    },
+    {
+        "Rank":19,
+        "Job Applicant Name":"Inouss",
+        "Score":0.46576843,
+        "Job Roles":"Front-end",
+        "Resume":"Proficient in Unit Testing, Data Structures, Problem Solving, Agile, Algorithms, with mid-level experience in the field. Holds a Bachelors degree. Holds certifications such as AWS Certified Solutions Architect. Skilled in delivering results and adapting to dynamic environments."
+    },
+    {
+        "Rank":20,
+        "Job Applicant Name":"Yariela",
+        "Score":0.46383905,
+        "Job Roles":"Front-end",
+        "Resume":"Proficient in Git, Algorithms, Agile, C++, Unit Testing, with senior-level experience in the field. Holds a Bachelors degree. Holds certifications such as Microsoft Certified: Azure Developer Associate. Skilled in delivering results and adapting to dynamic environments."
+    },
+    {
+        "Rank":21,
+        "Job Applicant Name":"Nenad",
+        "Score":0.46267426,
+        "Job Roles":"Front-end",
+        "Resume":"Proficient in Git, Unit Testing, Problem Solving, Java, C++, with mid-level experience in the field. Holds a Bachelors degree. Holds certifications such as Certified Kubernetes Administrator. Skilled in delivering results and adapting to dynamic environments."
+    },
+    {
+        "Rank":22,
+        "Job Applicant Name":"Elida",
+        "Score":0.40572184,
+        "Job Roles":"Front-end",
+        "Resume":"Proficient in Git, C++, Agile, Unit Testing, Algorithms, with senior-level experience in the field. Holds a Bachelors degree. Holds certifications such as Certified Kubernetes Administrator. Skilled in delivering results and adapting to dynamic environments."
+    }
+]

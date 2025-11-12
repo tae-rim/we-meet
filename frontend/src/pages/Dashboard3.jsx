@@ -4,8 +4,7 @@ import { useParams } from 'react-router-dom';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
 
-// src/data.json을 pages/에서 import 하려면 ../data.json이 맞습니다.
-import mockData from '../data.json'; 
+import mockData from '../ranked_results.json'; 
 
 /**
  * 지원자 상세 정보 페이지
@@ -16,7 +15,7 @@ export default function Dashboard3({ isLoggedIn, currentUser, onLogout }) {
   const { id } = useParams();
   
   // 2. mockData에서 id와 일치하는 지원자 찾기
-  const applicant = mockData.find(a => a.rank.toString() === id);
+  const applicant = mockData.find(a => a.Rank.toString() === id);
 
   // 3. 지원자 정보가 없을 경우 (예: 잘못된 URL)
   if (!applicant) {
@@ -38,7 +37,7 @@ export default function Dashboard3({ isLoggedIn, currentUser, onLogout }) {
   }
 
   // 4. 지원자 정보가 있을 경우 (정상 화면)
-  const jobTagClass = applicant.job === 'Back-End' 
+  const jobTagClass = applicant["Job Roles"].includes('Back-End')
     ? 'bg-orange-100 text-orange-600'
     : 'bg-green-100 text-green-600';
 
@@ -61,19 +60,20 @@ export default function Dashboard3({ isLoggedIn, currentUser, onLogout }) {
           {/* 3-1. 왼쪽: 지원자 정보 */}
           <div className="col-span-1 flex flex-col gap-6">
             
-            {/* 이름 및 직무 */}
+            {/* ★ 수정: 'name' -> 'Job Applicant Name', 'job' -> 'Job Roles' */}
             <div className="flex items-center gap-2">
-              <h1 className="text-3xl font-bold text-gray-900">{applicant.name}</h1>
+              <h1 className="text-3xl font-bold text-gray-900">{applicant["Job Applicant Name"]}</h1>
               <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${jobTagClass}`}>
-                {applicant.job}
+                {applicant["Job Roles"]}
               </span>
             </div>
 
-            {/* 정보 카드 4개 */}
-            <InfoCard title="종합점수" value={applicant.score} />
-            <InfoCard title="강점" value={applicant.strength} />
-            <InfoCard title="약점" value={applicant.weakness} />
-            <InfoCard title="경력" value={applicant.experience} />
+            {/* ★ 수정: 정보 카드를 ranked_results.json의 데이터로 변경 */}
+            {/* 'score' -> 'Score', 소수점 2자리까지 표시 */}
+            <InfoCard title="종합점수" value={applicant.Score.toFixed(2)} /> 
+            
+            {/* 'strength', 'weakness', 'experience' 대신 'Resume' 요약 표시 */}
+            <InfoCardLong title="이력서 요약" text={applicant.Resume} />
 
           </div>
 
@@ -91,11 +91,19 @@ export default function Dashboard3({ isLoggedIn, currentUser, onLogout }) {
   );
 }
 
-// 정보 카드 컴포넌트
+// 정보 카드 컴포넌트 (짧은 텍스트용)
 const InfoCard = ({ title, value }) => (
   <div className="w-full bg-white p-6 rounded-lg shadow-sm border border-gray-100">
     <p className="text-sm font-medium text-gray-500">{title}</p>
     <p className="text-3xl font-bold text-gray-900 mt-2">{value}</p>
+  </div>
+);
+
+// ★ 신규: 정보 카드 컴포넌트 (긴 텍스트용)
+const InfoCardLong = ({ title, text }) => (
+  <div className="w-full bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+    <p className="text-sm font-medium text-gray-500">{title}</p>
+    <p className="text-base text-gray-800 mt-3 leading-relaxed">{text}</p>
   </div>
 );
 

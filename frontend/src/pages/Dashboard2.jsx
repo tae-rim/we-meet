@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 // --- 예시 데이터 (나중에 실제 데이터로 대체) ---
 import chartData from '../chartdata.json';
-import mockData from '../data.json';
+import mockData from '../ranked_results.json';
 
 // 1~15위 / 16~30위 데이터 분리
 const column1Data = mockData.slice(0, 15);
@@ -42,12 +42,6 @@ export default function Dashboard2() {
             </h3>
           </div>
           <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100">
-            <p className="text-gray-500">서류 합격자 수</p>
-            <h3 className="text-3xl font-bold text-gray-800 mt-2">
-              103 <span className="text-xl font-medium">명</span>
-            </h3>
-          </div>
-          <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100">
             <p className="text-gray-500">평균 점수</p>
             <h3 className="text-3xl font-bold text-gray-800 mt-2">
               79.3 <span className="text-xl font-medium">점</span>
@@ -55,10 +49,9 @@ export default function Dashboard2() {
           </div>
         </div>
 
-        {/* 1-2. 차트 2개 */}
+        {/* 1-2. 차트 1개 */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <BarChart title="월별 지원자 수" />
-          <BarChart title="월별 합격자 수" />
         </div>
       </section>
 
@@ -74,7 +67,7 @@ export default function Dashboard2() {
             <div className="flex flex-col divide-y divide-gray-100">
               {column1Data.map((item) => (
                 <ApplicantRow 
-                  key={item.rank} 
+                  key={item.Rank} 
                   data={item} 
                   onViewOriginal={handleViewOriginal} 
                 />
@@ -88,7 +81,7 @@ export default function Dashboard2() {
             <div className="flex flex-col divide-y divide-gray-100">
               {column2Data.map((item) => (
                 <ApplicantRow 
-                  key={item.rank} 
+                  key={item.Rank} 
                   data={item} 
                   onViewOriginal={handleViewOriginal} 
                 />
@@ -155,23 +148,32 @@ const ApplicantListHeader = () => (
 
 // 지원자 한 줄(Row) 컴포넌트
 const ApplicantRow = ({ data, onViewOriginal }) => {
-  const jobTagClass = data.job === 'Back-End'
+  const jobTagClass = data["Job Roles"] === 'Front-end'
     ? 'bg-orange-100 text-orange-700'
     : 'bg-green-100 text-green-700';
 
+
   return (
     <div className="grid grid-cols-5 gap-4 py-4 px-4 items-center text-gray-700">
-      <span className="font-medium text-gray-500">{data.rank}</span>
-      <span className="font-semibold">{data.name}</span>
-      <span className="font-medium">{data.score}</span>
+      
+      {/* ★ 수정: data.rank -> data.Rank */}
+      <span className="font-medium text-gray-500">{data.Rank}</span>
+      
+      {/* ★ 수정: data.name -> data["Job Applicant Name"] */}
+      <span className="font-semibold">{data["Job Applicant Name"]}</span>
+      
+      {/* ★ 수정: data.score -> data.Score, 소수점 2자리 */}
+      <span className="font-medium">{data.Score.toFixed(2)}</span>
+      
       <span className="job">
+        {/* ★ 수정: data.job -> data["Job Roles"] */}
         <span className={`px-3 py-1 rounded-full text-xs font-medium ${jobTagClass}`}>
-          {data.job}
+          {data["Job Roles"]}
         </span>
       </span>
       <button
         className="text-right text-[#1AC0A4] hover:text-[#169a83]"
-        onClick={() => onViewOriginal(data.rank)}
+        onClick={() => onViewOriginal(data.Rank)} // ★ 수정: data.rank -> data.Rank
       >
         <ArrowIcon className="w-5 h-5 inline-block" />
       </button>
