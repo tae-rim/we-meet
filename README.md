@@ -1,7 +1,9 @@
 # we-meet
 
-# 원하는 폴더 위치에서
+### 원하는 폴더 위치에서
+```bash
 git clone https://github.com/tae-rim/we-meet.git
+```
 
 ### Frontend
 ```bash
