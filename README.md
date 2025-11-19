@@ -1,9 +1,6 @@
 # we-meet
 
-### 원하는 폴더위치에서
-# we-meet
-
-# 원하는 위치에서
+# 원하는 폴더 위치에서
 git clone https://github.com/tae-rim/we-meet.git
 
 ### Frontend
