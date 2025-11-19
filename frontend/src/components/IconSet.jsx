@@ -12,6 +12,9 @@ import { ReactComponent as UserSvg } from '../assets/icons/user.svg';
 import { ReactComponent as ArchiveSvg } from '../assets/icons/archive.svg';
 import { ReactComponent as SendSvg } from '../assets/icons/send.svg';
 import { ReactComponent as ArrowSvg } from '../assets/icons/arrow.svg';
+import { ReactComponent as CircleSvg } from '../assets/icons/Circle.svg';
+
+
 
 /**
  * 필터 아이콘 SVG를 React 컴포넌트로 래핑합니다.

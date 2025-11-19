@@ -62,5 +62,3 @@ export default function Dashboard1({ isAnalyzing, progress }) {
     </div>
   );
 }
-
-

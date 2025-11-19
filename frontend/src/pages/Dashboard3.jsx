@@ -106,4 +106,3 @@ const InfoCardLong = ({ title, text }) => (
     <p className="text-base text-gray-800 mt-3 leading-relaxed">{text}</p>
   </div>
 );
-

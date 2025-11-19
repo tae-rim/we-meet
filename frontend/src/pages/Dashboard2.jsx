@@ -1,16 +1,11 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { ArrowIcon } from "../components/IconSet"; // PascalCase
 import { useNavigate } from "react-router-dom";
 // 얘는 Dashboard1의 컴포넌트인 느낌. 그래서 Header와 Sidebar는 Dashboard1에서 불러쓰는걸로.
 
-// --- 예시 데이터 (나중에 실제 데이터로 대체) ---
+import { fetchAnalysisResults } from '../api'; // <-- API 함수 import
+
 import chartData from '../chartdata.json';
-import mockData from '../ranked_results.json';
-
-// 1~15위 / 16~30위 데이터 분리
-const column1Data = mockData.slice(0, 15);
-const column2Data = mockData.slice(15, 30);
-
 
 /**
  * 분석 완료 리포트 컴포넌트 (Dashboard1이 100% 완료되면 렌더링됨)
@@ -18,6 +13,27 @@ const column2Data = mockData.slice(15, 30);
 export default function Dashboard2() {
   
   const navigate = useNavigate();
+
+    // ✅ 1) 서버에서 가져온 데이터를 저장할 state
+  const [applicants, setApplicants] = useState([]);
+
+  // ✅ 2) 컴포넌트가 켜질 때 API 요청
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const result = await fetchAnalysisResults(1); // 예: ID = 1
+        setApplicants(result); // 받아온 데이터를 state에 저장
+      } catch (error) {
+        console.error("데이터 로드 실패:", error);
+      }
+    };
+
+    loadData();
+  }, []);
+
+  // ✅ 새 버전
+  const column1Data = applicants.slice(0, 15);
+  const column2Data = applicants.slice(15, 30);
 
   const handleViewOriginal = (rank) => {
     navigate(`/dashboard3/${rank}`);
@@ -180,4 +196,3 @@ const ApplicantRow = ({ data, onViewOriginal }) => {
     </div>
   );
 };
-

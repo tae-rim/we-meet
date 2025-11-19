@@ -2,18 +2,36 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 // 템플릿 파일 경로는 대소문자를 구분하므로 'Template.jsx'로 가정합니다.
 import Template from "../components/Template";
+import { loginUser } from "../api"; // ★ API 함수 import
 
-export default function LoginPage() {
-  const navigate = useNavigate(); // ← 컴포넌트 안에서 useNavigate 사용
+export default function LoginPage({ onLogin }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+const handleLoginSubmit = async (e) => {
     e.preventDefault();
-    console.log(`로그인 시도: ${email} / ${password}`);
-    // 로그인 성공 시 메인 페이지로 이동
-    navigate("/main");
-  };
+    setError("");
+
+    try {
+      // 1. API 호출 (수정된 api.js 덕분에 이제 정상 동작함)
+      const data = await loginUser(email, password);
+      // data = { access_token: "...", token_type: "bearer" }
+      
+      // 2. 유저 정보 만들기 (백엔드에서 토큰만 주므로, 임시로 이메일을 이름으로 사용)
+      const userInfo = { username: email.split('@')[0] }; 
+
+      // 3. App.js의 handleLogin 호출 (토큰도 같이 전달!)
+      onLogin(userInfo, data.access_token);
+      
+      navigate("/main");
+      
+    } catch (err) {
+      console.error("로그인 에러:", err);
+      setError("이메일 또는 비밀번호가 일치하지 않습니다.");
+    }
+};
 
   return (
     <Template>
@@ -40,7 +58,7 @@ export default function LoginPage() {
           </h1>
 
           {/* 입력 폼 */}
-          <form className="flex flex-col gap-6" onSubmit={handleLogin}>
+          <form className="flex flex-col gap-6" onSubmit={handleLoginSubmit}>
             
             {/* 아이디 */}
             <div className="flex flex-col gap-2">

@@ -8,7 +8,6 @@ export default function Sidebar() {
 
   const menuItems = [
     { id: 'analysis', name: '분석결과', Icon: AnalysisIcon },
-    { id: 'user', name: '지원자 비교', Icon: UserIcon },
     { id: 'archive', name: '이전 데이터', Icon: ArchiveIcon },
   ];
 

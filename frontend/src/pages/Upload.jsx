@@ -224,4 +224,3 @@ const handleAnalysisStart = () => {
     </div>
   );
 }
-

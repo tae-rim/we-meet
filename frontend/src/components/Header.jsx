@@ -2,8 +2,9 @@
 // 각 대시보드에서 고정된 부분.
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { CircleIcon } from "../components/IconSet";
 
-export default function Header() {
+export default function Header({ isLoggedIn, currentUser, onLogout }) {
   const navigate = useNavigate();
 
   return (
@@ -44,14 +45,27 @@ export default function Header() {
       </nav>
     </div>
 
-    {/* 오른쪽: 로그인 버튼 */}
-    <div className="flex items-center gap-2">    
-      <button
-        onClick={() => navigate("/login")}
-        className="px-5 py-2 bg-transparent border-2 border-[#1AC0A4] text-[#1AC0A4] font-medium rounded-md hover:bg-[#1AC0A4] hover:text-white transition-colors"
-      >
-        Sign in
-      </button>
+    {/* 오른쪽: 로그인/회원가입 버튼 or 유저 이름 + 로그아웃 */}
+    <div className="flex items-center gap-2">
+      {isLoggedIn ? (
+        <>
+          <CircleIcon />
+          <span className="text-gray-700 font-medium">{currentUser?.username}</span>
+          <button
+            onClick={onLogout}
+            className="px-5 py-2 bg-transparent border-2 border-[#1AC0A4] text-[#1AC0A4] font-medium rounded-md hover:bg-[#1AC0A4] hover:text-white transition-colors"
+          >
+            Logout
+          </button>
+        </>
+      ) : (
+        <button
+          onClick={() => navigate("/register")}
+          className="px-5 py-2 bg-transparent border-2 border-[#1AC0A4] text-[#1AC0A4] font-medium rounded-md hover:bg-[#1AC0A4] hover:text-white transition-colors"
+        >
+          Sign Up
+        </button>
+      )}
     </div>
   </div>
 </header>

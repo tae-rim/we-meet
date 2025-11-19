@@ -7,7 +7,8 @@ import Header from '../components/Header';
 function TemplateCard({ title }) {
   return (
     <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-6 flex flex-col items-center 
-                    mx-auto w-[300px] md:w-[320px] lg:w-[370px]">
+                    mx-auto w-[300px] md:w-[320px] lg:w-[370px]
+                    hover:border-[#1AC0A4] hover:shadow-xl transition-all duration-300">
       {/* 이력서 이미지 placeholder */}
       <div className="w-full h-96 bg-gray-200 rounded-md flex items-center justify-center">
         <span className="text-gray-500">이력서 이미지</span>
