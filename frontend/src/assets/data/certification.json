@@ -1,0 +1,73 @@
+{
+    "Cybersecurity Analyst": [
+        "Certified Ethical Hacker (CEH)",
+        "Certified Information Security Manager (CISM)",
+        "Certified Information Systems Security Professional (CISSP)",
+        "CompTIA Security+",
+        "GIAC Security Essentials (GSEC)"
+    ],
+    "Software Engineer": [
+        "AWS Certified Solutions Architect",
+        "Certified Kubernetes Administrator",
+        "Google Cloud Professional Cloud Architect",
+        "Microsoft Certified: Azure Developer Associate",
+        "Oracle Java Certification"
+    ],
+    "Machine Learning Engineer": [
+        "AWS Certified Machine Learning – Specialty",
+        "Google Professional Machine Learning Engineer",
+        "Machine Learning Specialization by Andrew Ng",
+        "Microsoft Certified: Azure AI Engineer Associate",
+        "TensorFlow Developer Certificate"
+    ],
+    "Product Manager": [
+        "Certified Product Marketing Manager (CPMM)",
+        "Certified Scrum Product Owner (CSPO)",
+        "Google Project Management Professional Certificate",
+        "Pragmatic Institute Certified Product Manager",
+        "Product Manager Certification",
+        "SAFe Product Owner"
+    ],
+    "AI Researcher": [
+        "Artificial Intelligence Research Certificate",
+        "Certified Data Scientist",
+        "Deep Learning Specialization by Andrew Ng",
+        "Google AI and Machine Learning Professional Certificate",
+        "IBM AI Engineering Professional Certificate"
+    ],
+    "Data Analyst": [
+        "Certified Analytics Professional (CAP)",
+        "Google Data Analytics Certificate",
+        "Microsoft Certified: Data Analyst Associate",
+        "SAS Certified Data Scientist",
+        "Tableau Desktop Specialist"
+    ],
+    "Web Developer": [
+        "AWS Certified Developer – Associate",
+        "Certified Web Developer by FreeCodeCamp",
+        "Full-Stack Web Development Certificate by Coursera",
+        "JavaScript Certification by W3Schools",
+        "Responsive Web Design Certification"
+    ],
+    "Cloud Architect": [
+        "AWS Certified Solutions Architect – Professional",
+        "Certified Cloud Security Professional (CCSP)",
+        "Google Professional Cloud Architect",
+        "IBM Cloud Solutions Architect Certification",
+        "Microsoft Certified: Azure Solutions Architect Expert"
+    ],
+    "UX Designer": [
+        "Adobe Certified Expert (ACE)",
+        "Certified UX Designer",
+        "Certified Usability Analyst (CUA)",
+        "Google UX Design Certificate",
+        "Human-Computer Interaction Certification"
+    ],
+    "Robotics Engineer": [
+        "Advanced Robotics Certification by Coursera",
+        "Certified Automation Professional (CAP)",
+        "Certified Robotics Technician",
+        "Machine Learning for Robotics Certificate",
+        "Robotics Process Automation (RPA) Developer Certificate"
+    ]
+}

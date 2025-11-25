@@ -1,21 +1,38 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 // VS Code 환경을 기준으로, 표준 React 컴포넌트 경로(대문자)로 수정합니다.
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
-
-import mockData from '../ranked_results.json'; 
+import axios from 'axios';
 
 /**
  * 지원자 상세 정보 페이지
  */
 export default function Dashboard3({ isLoggedIn, currentUser, onLogout }) {
-  
-  // 1. URL에서 :id 값을 가져옴
   const { id } = useParams();
-  
-  // 2. mockData에서 id와 일치하는 지원자 찾기
-  const applicant = mockData.find(a => a.Rank.toString() === id);
+  const [applicant, setApplicant] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+    const fetchApplicant = async () => {
+      try {
+        // 백엔드 분석 결과 API 호출
+        const res = await axios.get(`http://136.118.83.87:8000/api/applicants/${id}`);
+        setApplicant(res.data);
+      } catch (err) {
+        console.error(err);
+        setApplicant(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchApplicant();
+  }, [id]);
+
+  if (loading) {
+  return <div>Loading...</div>;
+  }
 
   // 3. 지원자 정보가 없을 경우 (예: 잘못된 URL)
   if (!applicant) {
@@ -62,9 +79,11 @@ export default function Dashboard3({ isLoggedIn, currentUser, onLogout }) {
             
             {/* ★ 수정: 'name' -> 'Job Applicant Name', 'job' -> 'Job Roles' */}
             <div className="flex items-center gap-2">
-              <h1 className="text-3xl font-bold text-gray-900">{applicant["Job Applicant Name"]}</h1>
+              <h1 className="text-3xl font-bold text-gray-900">
+                {applicant["Job Applicant Name"]}  // 기존: "Job Applicant Name"
+              </h1>
               <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${jobTagClass}`}>
-                {applicant["Job Roles"]}
+                {applicant["Job Roles"]}          // 기존: "Job Roles"
               </span>
             </div>
 

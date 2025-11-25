@@ -1,7 +1,14 @@
 import axios from 'axios';
 
 // 백엔드 서버 주소 (마지막에 슬래시 주의)
-const API_BASE_URL = "http://127.0.0.1:8000/api";
+const API_BASE_URL = "http://136.118.83.87:8000/api";
+
+const AI_BASE_URL = "http://136.117.180.115:5000";
+
+export const predictAI = async (text) => {
+  const response = await axios.post(`${AI_BASE_URL}/predict`, { text });
+  return response.data; // { result: ... }
+};
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,

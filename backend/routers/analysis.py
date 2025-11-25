@@ -10,7 +10,7 @@ from database import get_db
 # (참고) from ..security import get_current_user # 토큰으로 현재 유저 가져오기
 
 # --- AI 서버 설정 ---
-AI_SERVER_URL = "http://127.0.0.1:8001/analyze" # 친구의 AI 서버 주소
+AI_SERVER_URL = "http://136.117.180.115:5000/analyze"
 # --- ---
 
 router = APIRouter(
@@ -48,9 +48,11 @@ async def create_analysis(
                     applicant = dbmodels.Applicant(
                         job_id=job.id,
                         Rank=item['Rank'],
-                        Name=item['Job Applicant Name'],
+                        Name=item['Job Applicant Name'],        # 여기 키가 바뀌면 바꿔야 함
                         Score=item['Score'],
-                        Job_Role=item['Job Roles'],
+                        Job_Role=item['Job Roles'],             # 여기 키도 바뀌면 바꿔야 함
+                        Education=item['Education'],           # 새로 추가됨
+                        Certification=item['Certification'],   # 새로 추가됨
                         Resume_Summary=item['Resume']
                     )
                     db.add(applicant)

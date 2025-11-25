@@ -4,6 +4,8 @@ import { useDropzone } from "react-dropzone";
 import Header from "../components/Header";
 import { PlusIcon, FileIcon, XIcon } from "../components/IconSet";
 import { useNavigate } from "react-router-dom";
+import { predictAI } from "../api";
+import certificationsData from "../assets/data/certification.json"; 
 
 const SelectBox = ({ label, value, onChange, options }) => (
   <div className="flex flex-col gap-2">
@@ -29,6 +31,7 @@ export default function Upload({ isAnalyzing, setIsAnalyzing, setProgress }) {
   const [job, setJob] = useState("");
   const [degree, setDegree] = useState("");
   const [license, setLicense] = useState("");
+  const certificationOptions = job ? certificationsData[job] || [] : [];
   
   const navigate = useNavigate();
 
@@ -52,32 +55,44 @@ export default function Upload({ isAnalyzing, setIsAnalyzing, setProgress }) {
     setUploadedFiles(prevFiles => prevFiles.filter(file => file.name !== fileNameToRemove));
   };
 
-const handleAnalysisStart = () => {
+const handleAnalysisStart = async () => {
   setIsAnalyzing(true);
   setProgress(0);
 
-  // 샘플 시뮬레이션: 0~100%까지 1초마다 증가
-  const interval = setInterval(() => {
-    setProgress(prev => {
-      if (prev >= 100) {
-        clearInterval(interval);
-        setIsAnalyzing(false);
-        navigate("/dashboard1");
-        return 100;
-      }
-      return prev + 10;
-    });
-  }, 1000);
+  try {
+    // 예: criteria(채용 기준) 텍스트를 AI 서버에 보내서 예측
+    const aiResult = await predictAI(criteria);
+    console.log("AI 결과:", aiResult.result);
+
+    // 파일 업로드가 필요하면 여기에 추가 API 호출 가능
+    // await uploadFiles(uploadedFiles);
+
+    // 진행 상황 시뮬레이션 (혹은 실제 progress를 AI/백엔드에서 받아서 업데이트)
+    const interval = setInterval(() => {
+      setProgress(prev => {
+        if (prev >= 100) {
+          clearInterval(interval);
+          setIsAnalyzing(false);
+          navigate("/dashboard1", { state: { aiResult } }); // AI 결과를 Dashboard로 전달 가능
+          return 100;
+        }
+        return prev + 10;
+      });
+    }, 1000);
+  } catch (err) {
+    console.error("AI 요청 실패:", err);
+    setIsAnalyzing(false);
+  }
 };
 
   // 3. 버튼 비활성화 로직 (새로운 state 3개 추가)
   const isButtonDisabled = 
-    isAnalyzing || 
-    uploadedFiles.length === 0 || 
-    criteria.trim() === "" || 
-    job === "" || 
-    degree === "" || 
-    license === "";
+      isAnalyzing || 
+      uploadedFiles.length === 0 || 
+      criteria.trim() === "" || 
+      job === "" || 
+      degree === "";
+
 
   return (
     <div className="w-full min-h-screen bg-white">
@@ -169,20 +184,25 @@ const handleAnalysisStart = () => {
               <SelectBox 
                 label="직업" 
                 value={job} 
-                onChange={setJob} 
-                options={["Back-End", "Front-End", "AI/ML", "DevOps", "PM", "디자이너"]} 
+                onChange={(val) => {
+                  setJob(val);
+                  setLicense(""); // 직업 변경 시 자격증 초기화
+                }} 
+                options={Object.keys(certificationsData)} // JSON에서 자동으로 직업 목록
               />
+
               <SelectBox 
                 label="학위" 
                 value={degree} 
                 onChange={setDegree} 
                 options={["학사", "석사", "박사", "고졸", "무관"]} 
               />
+
               <SelectBox 
                 label="자격증 (선택)" 
                 value={license} 
                 onChange={setLicense} 
-                options={["정보처리기사", "AWS", "SQLD", "해당 없음"]} 
+                options={certificationOptions} // 직업별 동적 옵션
               />
             </div>
 
