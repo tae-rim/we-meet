@@ -31,7 +31,7 @@ app.add_middleware(
 
 # API 라우터 포함
 # --- 라우터 등록 ---
-app.include_router(auth.router)
+app.include_router(auth.router, prefix="/auth", tags=["auth"])
 app.include_router(analysis.router, prefix="/api/analysis") # /api/analysis 포함
 # (참고) /api/templates 라우터도 만들어서 여기에 포함시키세요
 

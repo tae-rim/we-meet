@@ -7,7 +7,7 @@ import Dashboard2 from './Dashboard2';
 /**
  * isAnalyzing 상태에 따라 다른 컨텐츠를 보여주는 컴포넌트
  */
-export default function Dashboard1({ isAnalyzing, progress }) {
+export default function Dashboard1({ isAnalyzing, progress, isLoggedIn, currentUser, onLogout }) {
   const [localProgress, setLocalProgress] = useState(progress);
 
   useEffect(() => {
@@ -21,7 +21,11 @@ export default function Dashboard1({ isAnalyzing, progress }) {
   if (progress >= 100) {
     return (
       <div className="w-full min-h-screen bg-white flex flex-col">
-        <Header />
+        <Header 
+          isLoggedIn={isLoggedIn} 
+          currentUser={currentUser} 
+          onLogout={onLogout} 
+        />
         <Sidebar />
         <main className="pl-64 pt-20 p-8">
           <Dashboard2 />
@@ -32,7 +36,11 @@ export default function Dashboard1({ isAnalyzing, progress }) {
 
   return (
     <div className="w-full min-h-screen bg-white">
-      <Header />
+      <Header 
+        isLoggedIn={isLoggedIn} 
+        currentUser={currentUser} 
+        onLogout={onLogout} 
+      />
       <Sidebar />
       <main className="pl-64 pt-20 p-8 flex flex-col items-center justify-center text-center min-h-[calc(100vh-80px)]">
         {!isAnalyzing ? (

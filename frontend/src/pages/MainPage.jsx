@@ -40,21 +40,6 @@ const StatsSection = () => {
     { rank: 5, name: "강OO", score: 95, role: "Front-End" },
   ];
 
-  const chartData = [
-    { month: "JAN", value: 480 },
-    { month: "FEB", value: 720 },
-    { month: "MAR", value: 630 },
-    { month: "APR", value: 630 },
-    { month: "MAY", value: 510 },
-    { month: "JUN", value: 830 },
-    { month: "JUL", value: 890 },
-    { month: "AUG", value: 450 },
-    { month: "SEP", value: 850 },
-    { month: "OCT", value: 760 },
-    { month: "NOV", value: 960 },
-    { month: "DEC", value: 1020 }, 
-  ];
-
   return (
     <section className="h-screen w-full flex items-center justify-center bg-gray-50 py-20">
       <div className="container mx-auto flex flex-col items-center gap-12 px-8">
@@ -66,40 +51,6 @@ const StatsSection = () => {
 
         {/* 컨텐츠 (차트 + 랭킹) */}
         <div className="w-full max-w-6xl flex gap-8">
-          {/* 1. 막대 차트 (CSS로 구현) - Fix 3: Y축 추가 */}
-          <div className="flex-1 bg-white p-6 rounded-lg shadow-md">
-            <div className="flex justify-between items-center mb-4">
-              <span className="font-semibold text-gray-700">CHART TEXT</span>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-[#79D7BE] rounded-sm"></div>
-                <span className="text-sm text-gray-500">LOREM</span>
-              </div>
-            </div>
-            {/* Y축 + 차트 */}
-            <div className="w-full h-[300px] flex">
-              {/* Y축 레이블 */}
-              <div className="h-full flex flex-col justify-between text-xs text-gray-400 pr-2 relative -top-2">
-                <span>1000</span>
-                <span>800</span>
-                <span>600</span>
-                <span>400</span>
-                <span>200</span>
-                <span className="text-transparent">0</span> {/* 0 line placeholder */}
-              </div>
-              {/* 차트 막대 (pb-5 for month labels) */}
-              <div className="w-full h-full flex items-end justify-between border-l border-b border-gray-200 pl-2 pb-5">
-                {chartData.map((bar) => (
-                  <div key={bar.month} className="flex flex-col items-center w-[6%] h-full justify-end">
-                    <div
-                      className="w-1/2 bg-[#79D7BE] rounded-t"
-                      style={{ height: `${bar.value / 10.2}%` }} // 1020 max = 100%
-                    ></div>
-                    <span className="text-xs text-gray-400 mt-1">{bar.month}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
 
 
           {/* 2. 지원자 순위 - Fix 4: 간격 및 태그 크기 수정 */}
@@ -175,11 +126,15 @@ const TemplatesSection = () => {
 };
 
 // 메인 페이지
-export default function MainPage() {
+export default function MainPage({ isLoggedIn, currentUser, onLogout }) {
   return (
     <div className="w-full bg-white">
       {/* 헤더를 고정합니다. */}
-      <Header />
+      <Header 
+        isLoggedIn={isLoggedIn} 
+        currentUser={currentUser} 
+        onLogout={onLogout} 
+      />
 
       {/* 스크롤 가능한 메인 컨텐츠 */}
       <main>

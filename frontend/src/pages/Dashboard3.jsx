@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 // VS Code 환경을 기준으로, 표준 React 컴포넌트 경로(대문자)로 수정합니다.
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
-import axios from 'axios';
+import { fetchApplicantDetail } from '../api';
 
 /**
  * 지원자 상세 정보 페이지
@@ -17,8 +17,8 @@ export default function Dashboard3({ isLoggedIn, currentUser, onLogout }) {
     const fetchApplicant = async () => {
       try {
         // 백엔드 분석 결과 API 호출
-        const res = await axios.get(`http://136.118.83.87:8000/api/applicants/${id}`);
-        setApplicant(res.data);
+        const data = await fetchApplicantDetail(id);
+        setApplicant(data);
       } catch (err) {
         console.error(err);
         setApplicant(null);
@@ -30,9 +30,7 @@ export default function Dashboard3({ isLoggedIn, currentUser, onLogout }) {
     fetchApplicant();
   }, [id]);
 
-  if (loading) {
-  return <div>Loading...</div>;
-  }
+  if (loading) return <div className="p-12 text-center text-lg">데이터를 불러오는 중...</div>;
 
   // 3. 지원자 정보가 없을 경우 (예: 잘못된 URL)
   if (!applicant) {
@@ -53,10 +51,53 @@ export default function Dashboard3({ isLoggedIn, currentUser, onLogout }) {
     );
   }
 
+  // ★ 데이터 안전하게 꺼내기 (대문자/소문자 모두 대응)
+  const name = applicant.Job_Applicant_Name || applicant.name || "이름 없음";
+  const jobRole = applicant.Job_Roles || applicant.job_role || "";
+  const score = applicant.Score || applicant.score || 0;
+  const education = applicant.Education || applicant.education || "정보 없음";
+  const certification = applicant.Certification || applicant.certification || "정보 없음";
+  const resumeSummary = applicant.Resume || applicant.resume_summary || "요약 정보가 없습니다.";
+
   // 4. 지원자 정보가 있을 경우 (정상 화면)
-  const jobTagClass = applicant["Job Roles"].includes('Back-End')
-    ? 'bg-orange-100 text-orange-600'
-    : 'bg-green-100 text-green-600';
+const getJobTagClass = (role) => {
+  const r = role.toLowerCase();
+
+  // 1. 개발 (Developer, Software, Web)
+  if (r.includes('software') || r.includes('web') || r.includes('developer')) {
+    return 'bg-teal-100 text-teal-700'; 
+  }
+
+  // 2. AI / 데이터 / 로봇
+  if (
+    r.includes('data') ||
+    r.includes('ai') ||
+    r.includes('machine') ||
+    r.includes('robotics')
+  ) {
+    return 'bg-sky-100 text-sky-700';
+  }
+
+  // 3. 디자인 (UX, UI, Designer)
+  if (r.includes('designer') || r.includes('ux') || r.includes('ui')) {
+    return 'bg-pink-100 text-pink-700';
+  }
+
+  // 4. 인프라 / 보안 (Cloud, Security, Infra)
+  if (r.includes('cloud') || r.includes('security') || r.includes('infra')) {
+    return 'bg-violet-100 text-violet-700';
+  }
+
+  // 5. 기획 / 매니징 (Product, PM, Manager)
+  if (r.includes('product') || r.includes('manager') || r.includes('pm')) {
+    return 'bg-yellow-100 text-yellow-700';
+  }
+
+  // 기본값 — 소프트 그레이
+  return 'bg-gray-100 text-gray-700';
+};
+
+  const jobTagClass = getJobTagClass(jobRole);
 
   return (
     <div className="w-full min-h-screen bg-white flex flex-col">
@@ -74,26 +115,27 @@ export default function Dashboard3({ isLoggedIn, currentUser, onLogout }) {
         {/* 3. 메인 컨텐츠 영역 (스크롤) */}
         <main className="flex-1 ml-64 p-12 bg-gray-50 grid grid-cols-3 gap-8">
           
-          {/* 3-1. 왼쪽: 지원자 정보 */}
+          {/* 왼쪽 정보 영역 */}
           <div className="col-span-1 flex flex-col gap-6">
             
-            {/* ★ 수정: 'name' -> 'Job Applicant Name', 'job' -> 'Job Roles' */}
-            <div className="flex items-center gap-2">
-              <h1 className="text-3xl font-bold text-gray-900">
-                {applicant["Job Applicant Name"]}  // 기존: "Job Applicant Name"
-              </h1>
-              <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${jobTagClass}`}>
-                {applicant["Job Roles"]}          // 기존: "Job Roles"
+            <div className="flex items-center gap-3">
+              <h1 className="text-3xl font-bold text-gray-900">{name}</h1>
+              <span className={`px-3 py-1 rounded-full text-xs font-medium ${jobTagClass}`}>
+                {jobRole}
               </span>
             </div>
 
-            {/* ★ 수정: 정보 카드를 ranked_results.json의 데이터로 변경 */}
-            {/* 'score' -> 'Score', 소수점 2자리까지 표시 */}
-            <InfoCard title="종합점수" value={applicant.Score.toFixed(2)} /> 
+            {/* 점수 */}
+            <InfoCard title="종합 점수" value={typeof score === 'number' ? score.toFixed(2) : "0.00"} />
             
-            {/* 'strength', 'weakness', 'experience' 대신 'Resume' 요약 표시 */}
-            <InfoCardLong title="이력서 요약" text={applicant.Resume} />
-
+            {/* 학력 */}
+            <InfoCardLong title="학력" text={education} />
+            
+            {/* 자격증 */}
+            <InfoCardLong title="자격증" text={certification} />
+            
+            {/* 이력서 요약 */}
+            <InfoCardLong title="이력서 요약" text={resumeSummary} />
           </div>
 
           {/* 3-2. 오른쪽: 이력서 원본 */}

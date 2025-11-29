@@ -11,10 +11,7 @@ def get_user_by_username(db: Session, username: str):
     return db.query(dbmodels.User).filter(dbmodels.User.username == username).first()
 
 # 유저 생성 (회원가입)
-def create_user(db: Session, user: schemas.UserCreate):
-    # 1. 비밀번호 해싱
-    hashed_password = security.get_password_hash(user.password)
-    
+def create_user(db: Session, user: schemas.UserCreate, hashed_password: str):
     # 2. DB 모델 생성
     # schemas.UserCreate에 username이 추가되었으므로 user.username 접근 가능!
     db_user = dbmodels.User(
@@ -30,8 +27,8 @@ def create_user(db: Session, user: schemas.UserCreate):
     return db_user
 
 # 분석 작업 생성
-def create_analysis_job(db: Session, owner_id: int):
-    db_job = dbmodels.AnalysisJob(owner_id=owner_id, status="PENDING")
+def create_analysis_job(db: Session, owner_id: int, title: str = "", degree: str = "",license: str = "", criteria: str = ""):
+    db_job = dbmodels.AnalysisJob(owner_id=owner_id, status="PENDING", progress=0,title=title,degree=degree,license=license,criteria=criteria)
     db.add(db_job)
     db.commit()
     db.refresh(db_job)

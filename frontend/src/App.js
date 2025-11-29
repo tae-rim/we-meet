@@ -95,7 +95,9 @@ export default function App() {
         />
 
         {/* 메인 페이지 */}
-        <Route path="/main" element={<MainPage />} />
+        <Route path="/main" element={<MainPage isLoggedIn={isLoggedIn} 
+              currentUser={currentUser} 
+              onLogout={handleLogout}/>} />
 
         {/* Protected Routes (로그인 필요한 페이지들) */}
         <Route 

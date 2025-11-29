@@ -26,6 +26,12 @@ class AnalysisJob(Base):
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     owner_id = Column(Integer, ForeignKey("users.id"))
     
+    # ★ [추가] 검색 조건들을 저장할 컬럼들
+    title = Column(String(255), nullable=True)      # 직무 (예: Software Engineer)
+    degree = Column(String(255), nullable=True)     # 학위
+    license = Column(String(255), nullable=True)    # 자격증
+    criteria = Column(Text, nullable=True)          # 상세 요건
+
     owner = relationship("User", back_populates="analysis_jobs")
     applicants = relationship("Applicant", back_populates="job")
 
@@ -40,6 +46,10 @@ class Applicant(Base):
     name = Column(String(255), name="Job Applicant Name")
     score = Column(Float, name="Score")
     job_role = Column(String(255), name="Job Roles")
+
+    education = Column(String(255), name="Education", nullable=True)
+    certification = Column(Text, name="Certification", nullable=True)
+
     resume_summary = Column(Text, name="Resume")
     # resume_original_path = Column(String(1024)) # 원본 파일 저장 경로 (S3 등)
     

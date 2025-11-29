@@ -22,7 +22,7 @@ const SelectBox = ({ label, value, onChange, options }) => (
   </div>
 );
 
-export default function Upload({ isAnalyzing, setIsAnalyzing, setProgress }) {
+export default function Upload({ isAnalyzing, setIsAnalyzing, setProgress, progress, isLoggedIn, currentUser, onLogout }) {
   // --- State 정의 ---
   const [uploadedFiles, setUploadedFiles] = useState([]); // File 객체 배열
   const [criteria, setCriteria] = useState(""); // 인재상(채용 기준) 입력값
@@ -61,27 +61,26 @@ const handleAnalysisStart = async () => {
 
   try {
     // 예: criteria(채용 기준) 텍스트를 AI 서버에 보내서 예측
-    const aiResult = await predictAI(criteria);
+    const aiResult = await predictAI(uploadedFiles[0], criteria, job, degree, license, (percent) => setProgress(percent));
+    // --- 여기 오면 업로드 및 분석 완료 ---
+    setProgress(100); // 강제로 100% 채우기    
     console.log("AI 결과:", aiResult.result);
 
-    // 파일 업로드가 필요하면 여기에 추가 API 호출 가능
-    // await uploadFiles(uploadedFiles);
-
-    // 진행 상황 시뮬레이션 (혹은 실제 progress를 AI/백엔드에서 받아서 업데이트)
-    const interval = setInterval(() => {
-      setProgress(prev => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          setIsAnalyzing(false);
-          navigate("/dashboard1", { state: { aiResult } }); // AI 결과를 Dashboard로 전달 가능
-          return 100;
-        }
-        return prev + 10;
-      });
-    }, 1000);
+    // ★ [추가] 방금 만든 Job ID를 로컬 스토리지에 저장!
+    if (aiResult && aiResult.id) {
+        console.log("생성된 Job ID:", aiResult.id);
+        localStorage.setItem("latestJobId", aiResult.id);
+    }
+    
+    // 약간의 딜레이 후 이동 (100%를 눈으로 볼 시간을 줌)
+    setTimeout(() => {
+        setIsAnalyzing(false);
+        navigate("/dashboard1", { state: { aiResult } });
+    }, 500);
   } catch (err) {
     console.error("AI 요청 실패:", err);
     setIsAnalyzing(false);
+    alert("분석 중 오류가 발생했습니다. (서버 연결 확인 필요)");
   }
 };
 
@@ -97,7 +96,11 @@ const handleAnalysisStart = async () => {
   return (
     <div className="w-full min-h-screen bg-white">
       {/* 1. 고정 헤더 */}
-      <Header />
+            <Header 
+              isLoggedIn={isLoggedIn} 
+              currentUser={currentUser} 
+              onLogout={onLogout} 
+            />
 
       {/* 2. 메인 컨텐츠 영역 */}
       <main className="w-full max-w-5xl mx-auto pt-24 pb-12 px-8">
@@ -192,10 +195,10 @@ const handleAnalysisStart = async () => {
               />
 
               <SelectBox 
-                label="학위" 
+                label="학위 (선택)" 
                 value={degree} 
                 onChange={setDegree} 
-                options={["학사", "석사", "박사", "고졸", "무관"]} 
+                options={["Bachelors", "Master", "phD"]} 
               />
 
               <SelectBox 
@@ -236,7 +239,9 @@ const handleAnalysisStart = async () => {
                         }`}
                         >
             {isAnalyzing
-              ? "분석 중입니다. 진행 상황은 Dashboard에서 확인하세요."
+              ? (progress < 99 
+                  ? `파일 업로드 중입니다... ${progress}%` 
+                  : "AI가 열심히 이력서를 분석하고 있습니다...")
               : "분석 시작하기"}
           </button>
         </div>

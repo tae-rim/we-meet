@@ -5,8 +5,6 @@ import { useNavigate } from "react-router-dom";
 
 import { fetchAnalysisResults } from '../api'; // <-- API 함수 import
 
-import chartData from '../chartdata.json';
-
 /**
  * 분석 완료 리포트 컴포넌트 (Dashboard1이 100% 완료되면 렌더링됨)
  */
@@ -21,8 +19,19 @@ export default function Dashboard2() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const result = await fetchAnalysisResults(1); // 예: ID = 1
-        setApplicants(result); // 받아온 데이터를 state에 저장
+        const storedId = localStorage.getItem("latestJobId") || 1;
+        
+        console.log(`Job ID ${storedId}의 데이터를 불러옵니다...`);
+
+        const result = await fetchAnalysisResults(storedId);
+
+        const sortedResult = [...result].sort((a, b) => {
+             const scoreA = a.Score || a.score || 0;
+             const scoreB = b.Score || b.score || 0;
+             return scoreB - scoreA;
+        });
+        
+        setApplicants(sortedResult); // 받아온 데이터를 state에 저장
       } catch (error) {
         console.error("데이터 로드 실패:", error);
       }
@@ -54,20 +63,17 @@ export default function Dashboard2() {
           <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100">
             <p className="text-gray-500">전체 지원자 수</p>
             <h3 className="text-3xl font-bold text-gray-800 mt-2">
-              1,294 <span className="text-xl font-medium">명</span>
+              {applicants.length} <span className="text-xl font-medium">명</span>
             </h3>
           </div>
           <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100">
             <p className="text-gray-500">평균 점수</p>
             <h3 className="text-3xl font-bold text-gray-800 mt-2">
-              79.3 <span className="text-xl font-medium">점</span>
+              {applicants.length > 0 
+                ? (applicants.reduce((acc, curr) => acc + (curr.Score || curr.score || 0), 0) / applicants.length).toFixed(1) 
+                : 0} <span className="text-xl font-medium">점</span>
             </h3>
           </div>
-        </div>
-
-        {/* 1-2. 차트 1개 */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <BarChart title="월별 지원자 수" />
         </div>
       </section>
 
@@ -75,80 +81,28 @@ export default function Dashboard2() {
       <section className="flex flex-col gap-6">
         <h2 className="text-2xl font-bold text-gray-800">지원자 순위</h2>
         
-        {/* 2-1. 지원자 목록 (2열 그리드) */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* 왼쪽 열 (1-15위) */}
-          <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100">
-            <ApplicantListHeader />
-            <div className="flex flex-col divide-y divide-gray-100">
-              {column1Data.map((item) => (
-                <ApplicantRow 
-                  key={item.Rank} 
-                  data={item} 
-                  onViewOriginal={handleViewOriginal} 
-                />
-              ))} 
-            </div>
+        {/* ★ 수정: 그리드 제거하고 하나의 큰 박스로 변경 */}
+        <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100">
+          
+          <ApplicantListHeader />
+          
+          <div className="flex flex-col divide-y divide-gray-100">
+            {/* 전체 지원자를 한 번에 렌더링 */}
+            {applicants.map((item, index) => (
+              <ApplicantRow 
+                key={item.id || index}
+                data={item} 
+                onViewOriginal={handleViewOriginal} 
+              />
+            ))} 
           </div>
 
-          {/* 오른쪽 열 (16-30위) */}
-          <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100">
-            <ApplicantListHeader />
-            <div className="flex flex-col divide-y divide-gray-100">
-              {column2Data.map((item) => (
-                <ApplicantRow 
-                  key={item.Rank} 
-                  data={item} 
-                  onViewOriginal={handleViewOriginal} 
-                />
-              ))}
-            </div>
-          </div>
         </div>
       </section>
 
     </div>
   );
 };
-
-// --- 하위 컴포넌트 ---
-
-// 막대 차트
-const BarChart = ({ title }) => (
-  <div className="flex-1 bg-white p-6 rounded-lg shadow-md border border-gray-100">
-    <div className="flex justify-between items-center mb-4">
-      <span className="font-semibold text-gray-700">{title} (CHART TEXT)</span>
-      <div className="flex items-center gap-2">
-        <div className="w-3 h-3 bg-[#79D7BE] rounded-sm"></div>
-        <span className="text-sm text-gray-500">LOREM</span>
-      </div>
-    </div>
-    {/* Y축 + 차트 */}
-    <div className="w-full h-[300px] flex">
-      {/* Y축 레이블 */}
-      <div className="h-full flex flex-col justify-between text-xs text-gray-400 pr-2 relative -top-2">
-        <span>1000</span>
-        <span>800</span>
-        <span>600</span>
-        <span>400</span>
-        <span>200</span>
-        <span className="text-transparent">0</span> {/* 0 line placeholder */}
-      </div>
-      {/* 차트 막대 */}
-      <div className="w-full h-full flex items-end justify-between border-l border-b border-gray-200 pl-2 pb-5">
-        {chartData.map((bar) => (
-          <div key={bar.month} className="flex flex-col items-center w-[6%] h-full justify-end">
-            <div
-              className="w-1/2 bg-[#79D7BE] rounded-t-sm"
-              style={{ height: `${bar.value / 10.2}%` }} // 1020 max = 100%
-            ></div>
-            <span className="text-xs text-gray-400 mt-1">{bar.month}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  </div>
-);
 
 
 // 지원자 리스트 헤더
@@ -164,32 +118,75 @@ const ApplicantListHeader = () => (
 
 // 지원자 한 줄(Row) 컴포넌트
 const ApplicantRow = ({ data, onViewOriginal }) => {
-  const jobTagClass = data["Job Roles"] === 'Front-end'
-    ? 'bg-orange-100 text-orange-700'
-    : 'bg-green-100 text-green-700';
+  // 1. [핵심 수정] 대문자(Schema) 또는 소문자(DB) 키가 와도 모두 처리하도록 OR(||) 연산자 사용
+  const rank = data.Rank || data.rank || 0;
+  const name = data.Job_Applicant_Name || data.name || "이름 없음";
+  const score = data.Score || data.score || 0;
+  const jobRole = data.Job_Roles || data.job_role || ""; // DB 컬럼명이 job_role일 수 있음
+
+const getJobTagClass = (role) => {
+  const r = role.toLowerCase();
+
+  // 1. 개발 (Developer, Software, Web)
+  if (r.includes('software') || r.includes('web') || r.includes('developer')) {
+    return 'bg-teal-100 text-teal-700'; 
+  }
+
+  // 2. AI / 데이터 / 로봇
+  if (
+    r.includes('data') ||
+    r.includes('ai') ||
+    r.includes('machine') ||
+    r.includes('robotics')
+  ) {
+    return 'bg-sky-100 text-sky-700';
+  }
+
+  // 3. 디자인 (UX, UI, Designer)
+  if (r.includes('designer') || r.includes('ux') || r.includes('ui')) {
+    return 'bg-pink-100 text-pink-700';
+  }
+
+  // 4. 인프라 / 보안 (Cloud, Security, Infra)
+  if (r.includes('cloud') || r.includes('security') || r.includes('infra')) {
+    return 'bg-violet-100 text-violet-700';
+  }
+
+  // 5. 기획 / 매니징 (Product, PM, Manager)
+  if (r.includes('product') || r.includes('manager') || r.includes('pm')) {
+    return 'bg-yellow-100 text-yellow-700';
+  }
+
+  // 기본값 — 소프트 그레이
+  return 'bg-gray-100 text-gray-700';
+};
+
+  const jobTagClass = getJobTagClass(jobRole);
 
 
   return (
     <div className="grid grid-cols-5 gap-4 py-4 px-4 items-center text-gray-700">
       
       {/* ★ 수정: data.rank -> data.Rank */}
-      <span className="font-medium text-gray-500">{data.Rank}</span>
+      <span className="font-medium text-gray-500">{rank}</span>
       
       {/* ★ 수정: data.name -> data["Job Applicant Name"] */}
-      <span className="font-semibold">{data["Job Applicant Name"]}</span>
+      <span className="font-semibold">{name}</span>
       
       {/* ★ 수정: data.score -> data.Score, 소수점 2자리 */}
-      <span className="font-medium">{data.Score.toFixed(2)}</span>
+      <span className="font-medium">
+              {typeof score === 'number' ? score.toFixed(2) : "0.00"}
+            </span>
       
       <span className="job">
         {/* ★ 수정: data.job -> data["Job Roles"] */}
         <span className={`px-3 py-1 rounded-full text-xs font-medium ${jobTagClass}`}>
-          {data["Job Roles"]}
+          {jobRole}
         </span>
       </span>
       <button
         className="text-right text-[#1AC0A4] hover:text-[#169a83]"
-        onClick={() => onViewOriginal(data.Rank)} // ★ 수정: data.rank -> data.Rank
+        onClick={() => onViewOriginal(data.id)} 
       >
         <ArrowIcon className="w-5 h-5 inline-block" />
       </button>

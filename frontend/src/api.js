@@ -1,21 +1,53 @@
 import axios from 'axios';
 
 // 백엔드 서버 주소 (마지막에 슬래시 주의)
-const API_BASE_URL = "http://136.118.83.87:8000/api";
-
-const AI_BASE_URL = "http://136.117.180.115:5000";
-
-export const predictAI = async (text) => {
-  const response = await axios.post(`${AI_BASE_URL}/predict`, { text });
-  return response.data; // { result: ... }
-};
-
+const BACKEND_URL = "http://localhost:8000/api/analysis";
 const apiClient = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    "Content-Type": "application/json",
-  },
+  baseURL: "http://localhost:8000", // FastAPI 서버
 });
+
+// ★ [추가] 요청을 보내기 전에 가로채서 토큰을 헤더에 심는 코드 (Interceptor)
+apiClient.interceptors.request.use(
+  (config) => {
+    // 로컬 스토리지에서 토큰을 꺼냅니다.
+    const token = localStorage.getItem("access_token");
+    
+    // 토큰이 있으면 헤더에 'Bearer 토큰값' 형태로 붙입니다.
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+export const predictAI = async (zipFile, criteria, job, degree, license, onProgress) => {
+  const formData = new FormData();
+  formData.append("files", zipFile);   // FastAPI에서 files로 받음
+  formData.append("criteria", criteria);
+  // ★ 중요: 사용자가 입력한 모든 정보를 다 담아서 보냅니다.
+  formData.append("job", job || "");        
+  formData.append("degree", degree || "");
+  formData.append("license", license || "");
+
+  const response = await apiClient.post("/api/analysis/", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+    onUploadProgress: (progressEvent) => {
+      if (progressEvent.total) {
+        const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+        // Upload.jsx에서 넘겨준 함수(setProgress)를 여기서 실행!
+        if (onProgress) {
+            // 99%까지만 보여주고, 100%는 응답이 왔을 때 찍도록 함 (UX 팁)
+            onProgress(percentCompleted > 99 ? 99 : percentCompleted);
+        }
+      }
+    },
+  });
+
+  return response.data;
+};
 
 // --- API 함수들 ---
 
@@ -47,33 +79,18 @@ export const registerUser = async (email, username, password) => {
   return response.data;
 };
 
-// 3. 파일 업로드
-export const uploadFiles = async (files) => {
-  const formData = new FormData();
-  // files가 배열인지 확인 후 처리
-  if (Array.isArray(files)) {
-      files.forEach((file) => {
-        formData.append("files", file);
-      });
-  } else {
-      formData.append("files", files);
-  }
-  
-  const response = await apiClient.post("/analysis", formData, {
-    headers: { "Content-Type": "multipart/form-data" },
-  });
-  return response.data;
-};
-
 // 4. 분석 결과 조회 등 나머지 함수는 그대로 유지
 export const fetchAnalysisResults = async (jobId) => {
-  const response = await apiClient.get(`/analysis/${jobId}/applicants`);
+  const response = await apiClient.get(`api/analysis/${jobId}/applicants`);
   return response.data; 
 };
 
 export const fetchApplicantDetail = async (applicantId) => {
-  const response = await apiClient.get(`/applicants/${applicantId}`);
+  const response = await apiClient.get(`api/analysis/applicants/${applicantId}`);
   return response.data;
 };
 
-export default apiClient;
+export const fetchHistoryList = async () => {
+  const response = await apiClient.get("/api/analysis/history/all");
+  return response.data;
+};

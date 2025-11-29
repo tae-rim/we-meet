@@ -30,11 +30,15 @@ function TemplateCard({ title }) {
 /**
  * Resume Templates 페이지
  */
-export default function ResumeTemplates() {
+export default function ResumeTemplates({ isLoggedIn, currentUser, onLogout }) {
   return (
     <div className="w-full min-h-screen bg-white">
       {/* 1. 고정 헤더 */}
-      <Header />
+      <Header 
+        isLoggedIn={isLoggedIn} 
+        currentUser={currentUser} 
+        onLogout={onLogout} 
+      />
 
       {/* 2. 메인 컨텐츠 영역 */}
       <main className="w-full max-w-6xl mx-auto pt-24 pb-12 px-8">

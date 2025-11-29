@@ -1,5 +1,5 @@
 # Pydantic을 사용해 API가 받을 요청(Request)과 보낼 응답(Response)의 형식을 검증
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import List, Optional
 
 # --- Token 관련 스키마 ---
@@ -31,9 +31,7 @@ class User(BaseModel):
     email: str
     username: str
     is_active: bool = True
-
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 # --- 프론트엔드 JSON 구조와 일치시키는 Schema ---
 class ApplicantResponse(BaseModel):
@@ -44,11 +42,12 @@ class ApplicantResponse(BaseModel):
     Job_Applicant_Name: str = Field(..., alias="name")
     Score: float = Field(..., alias="score")
     Job_Roles: str = Field(..., alias="job_role")
+    Education: Optional[str] = Field(None, alias="education")
+    Certification: Optional[str] = Field(None, alias="certification")
+
     Resume: str = Field(..., alias="resume_summary")
 
-    class Config:
-        orm_mode = True
-        allow_population_by_field_name = True
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
 
 class AnalysisJob(BaseModel):
     id: int
@@ -56,16 +55,19 @@ class AnalysisJob(BaseModel):
     progress: int
     # applicants: List[ApplicantResponse] = [] # 리스트 포함 시
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class Applicant(BaseModel):
     id: int
-    name: str
-    score: float
-    job_role: str
-    resume_summary: str
+    rank: Optional[int] = None
+    name: Optional[str] = None
+    score: Optional[float] = None
+    job_role: Optional[str] = None
+    
+    education: Optional[str] = None      
+    certification: Optional[str] = None  
+    
+    resume_summary: Optional[str] = None
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
