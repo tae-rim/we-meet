@@ -107,22 +107,8 @@ async def create_analysis(
                     if not isinstance(item, dict): continue
 
                     # 요약문 생성 (그대로 유지)
-                    raw_resume = item.get('Resume') or item.get('resume')
-                    if not raw_resume:
-                        # 스킬 데이터 가져오기 (없으면 빈 리스트)
-                        skill_list = []
-                        if item.get('Skill_1'): skill_list.append(item.get('Skill_1'))
-                        if item.get('Skill_2'): skill_list.append(item.get('Skill_2'))
-                        
-                        # 스킬을 콤마(,)로 연결
-                        skills_str = ", ".join(skill_list) if skill_list else "None"
-                        
-                        # ★ 가독성 좋은 포맷 (불렛 포인트 사용)
-                        raw_resume = (
-                            f"📌 Position: {item.get('Job Roles', 'Unknown')}\n"
-                            f"🛠 Skills: {skills_str}\n"
-                            f"🎓 Education: {item.get('Degree', 'N/A')}"
-                        )
+                    raw_resume = item.get('Resume') or item.get('resume') or ""
+
 
                     applicant = dbmodels.Applicant(
                         job_id=db_job.id,
