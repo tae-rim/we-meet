@@ -3,7 +3,7 @@ import axios from 'axios';
 // 백엔드 서버 주소 (마지막에 슬래시 주의)
 const BACKEND_URL = "http://localhost:8000/api/analysis";
 const apiClient = axios.create({
-  baseURL: "http://136.117.185.66:8000", // FastAPI 서버
+  baseURL: "http://35.197.63.130:8000", // FastAPI 서버
 });
 
 // ★ [추가] 요청을 보내기 전에 가로채서 토큰을 헤더에 심는 코드 (Interceptor)
