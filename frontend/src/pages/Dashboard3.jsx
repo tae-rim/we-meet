@@ -5,6 +5,14 @@ import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
 import { fetchApplicantDetail } from '../api';
 
+// ★ [추가 1] React-PDF 라이브러리 및 스타일
+import { Document, Page, pdfjs } from 'react-pdf';
+import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
+import 'react-pdf/dist/esm/Page/TextLayer.css';
+
+// ★ [추가 2] PDF Worker 설정 (필수)
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+
 /**
  * 지원자 상세 정보 페이지
  */
@@ -12,6 +20,9 @@ export default function Dashboard3({ isLoggedIn, currentUser, onLogout }) {
   const { id } = useParams();
   const [applicant, setApplicant] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  // ★ [추가 3] PDF 페이지 수 상태 관리
+  const [numPages, setNumPages] = useState(null);
 
     useEffect(() => {
     const fetchApplicant = async () => {
@@ -29,6 +40,29 @@ export default function Dashboard3({ isLoggedIn, currentUser, onLogout }) {
 
     fetchApplicant();
   }, [id]);
+
+  // ★ [추가 4] PDF 로드 성공 시 페이지 수 설정 함수
+  function onDocumentLoadSuccess({ numPages }) {
+    setNumPages(numPages);
+  }
+
+// ★ [핵심] 하이라이트 로직 (Custom Text Renderer)
+  const highlightPattern = (textItem) => {
+    // 키워드가 없으면 그냥 글자만 리턴
+    if (!applicant || !applicant.keywords) return textItem.str;
+
+    // DB에 저장된 "Python, AWS, Master" 같은 문자열을 배열로 변환
+    const keywords = applicant.keywords.split(',').map(k => k.trim()).filter(k => k);
+    if (keywords.length === 0) return textItem.str;
+
+    // 정규식으로 키워드 찾기 (대소문자 무시)
+    const regex = new RegExp(`(${keywords.join('|')})`, 'gi');
+    
+    // 매칭되는 부분을 <mark> 태그(노란 형광펜)로 감싸서 리턴
+    return textItem.str.split(regex).map((part, index) => 
+      regex.test(part) ? <mark key={index} style={{ backgroundColor: '#ffeb3b' }}>{part}</mark> : part
+    );
+  };
 
   if (loading) return <div className="p-12 text-center text-lg">데이터를 불러오는 중...</div>;
 
@@ -58,6 +92,7 @@ export default function Dashboard3({ isLoggedIn, currentUser, onLogout }) {
   const education = applicant.Education || applicant.education || "정보 없음";
   const certification = applicant.Certification || applicant.certification || "정보 없음";
   const resumeSummary = applicant.Resume || applicant.resume_summary || "요약 정보가 없습니다.";
+  const pdfUrl = applicant.Pdf_Url || applicant.pdf_url;
 
   // 4. 지원자 정보가 있을 경우 (정상 화면)
 const getJobTagClass = (role) => {

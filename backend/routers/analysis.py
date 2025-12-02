@@ -9,6 +9,9 @@ import traceback
 from routers.auth import get_current_user 
 import crud, schemas, dbmodels, database
 from database import get_db
+import zipfile
+import os
+import shutil
 
 # --- AI 서버 설정 ---
 AI_SERVER_URL = "http://34.168.7.102:5000/api/v1/screen"
@@ -39,11 +42,32 @@ async def create_analysis(
         criteria=criteria
     ) 
 
+    # 2. 파일 저장 및 압축 해제 로직 (★ 추가된 부분)
+    # 저장할 폴더: static/resumes/{job_id}/
+    upload_dir = f"static/resumes/{db_job.id}"
+    os.makedirs(upload_dir, exist_ok=True)
+
     # 2. 파일 준비
     ai_files = []
     for f in files:
+    # 1) 일단 내용을 읽음 (AI 전송용)
         file_content = await f.read()
         ai_files.append(('file', (f.filename, file_content, f.content_type)))
+        
+        # 2) 로컬에 ZIP 파일 저장
+        zip_path = os.path.join(upload_dir, f.filename)
+        with open(zip_path, "wb") as buffer:
+            buffer.write(file_content)
+            
+        # 3) 압축 풀기
+        try:
+            with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+                zip_ref.extractall(upload_dir)
+            print(f"✅ 압축 해제 완료: {upload_dir}")
+        except Exception as e:
+            print(f"⚠️ 압축 해제 실패 (PDF 아닐 수 있음): {e}")
+
+    
     
     # 3. [핵심] 프롬프트 생성 (변수 직접 사용!)
     # ★ 수정 2: db_job.title 대신 입력받은 'job' 문자열을 바로 사용
@@ -107,21 +131,18 @@ async def create_analysis(
                     if not isinstance(item, dict): continue
 
                     # 요약문 생성 (그대로 유지)
-                    raw_resume = item.get('Resume') or item.get('resume')
-                    if not raw_resume:
-                        skill1 = item.get('Skill_1', '')
-                        skill2 = item.get('Skill_2', '')
-                        skills_text = f"Skills: {skill1}, {skill2}" if (skill1 or skill2) else ""
-                        raw_resume = (
-                            f"Applicant for {item.get('Job Roles', 'Unknown Position')}.\n"
-                            f"{skills_text}\n"
-                            f"Education: {item.get('Degree', 'N/A')}"
-                        )
+                    raw_resume = item.get('Resume') or item.get('resume') or ""
 
+                    # [추가] PDF 파일 URL 만들기
+                    file_name = item.get('File_Name') or f"{item.get('Name')}.pdf"
+                    
+                    server_url = "http://136.117.27.55:8000" 
+                    pdf_link = f"{server_url}/static/resumes/{db_job.id}/{file_name}"
+                    
                     applicant = dbmodels.Applicant(
                         job_id=db_job.id,
                         
-                        # ★ [핵심 수정] AI가 준 'Rank' 대신, 우리가 센 순서(index)를 넣습니다.
+                        # ★ [핵심 수정] AI가 준 'Rank`' 대신, 우리가 센 순서(index)를 넣습니다.
                         rank=index,  
                         
                         name=item.get('Name') or item.get('name'),
@@ -129,7 +150,8 @@ async def create_analysis(
                         job_role=item.get('Job Roles') or item.get('job_role'),
                         education=item.get('Degree') or item.get('degree'),
                         certification=item.get('Certification') or item.get('certification'),
-                        resume_summary=raw_resume
+                        resume_summary=raw_resume,
+                        pdf_url=pdf_link
                     )
                     db.add(applicant)
                 

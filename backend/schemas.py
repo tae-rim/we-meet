@@ -46,6 +46,7 @@ class ApplicantResponse(BaseModel):
     Certification: Optional[str] = Field(None, alias="certification")
 
     Resume: str = Field(..., alias="resume_summary")
+    Pdf_Url: Optional[str] = Field(None, alias="pdf_url")
 
     model_config = ConfigDict(from_attributes=True, populate_by_name=True)
 
@@ -69,5 +70,6 @@ class Applicant(BaseModel):
     certification: Optional[str] = None  
     
     resume_summary: Optional[str] = None
+    pdf_url: Optional[str] = None
 
     model_config = ConfigDict(from_attributes=True)

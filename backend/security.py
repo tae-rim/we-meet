@@ -4,6 +4,7 @@ from jose import JWTError, jwt
 from datetime import datetime, timedelta
 from typing import Optional
 
+
 # --- .env 파일에서 읽어와야 함 ---
 SECRET_KEY = "YOUR_VERY_SECRET_KEY" # 실제로는 .env에서 관리
 ALGORITHM = "HS256"

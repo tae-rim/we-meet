@@ -52,5 +52,6 @@ class Applicant(Base):
 
     resume_summary = Column(Text, name="Resume")
     # resume_original_path = Column(String(1024)) # 원본 파일 저장 경로 (S3 등)
-    
+    pdf_url = Column(String(500), nullable=True)
+
     job = relationship("AnalysisJob", back_populates="applicants")

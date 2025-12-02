@@ -1,6 +1,7 @@
 # FastAPI 실행. 모든 것 하나로 합치기.
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+import os
 from routers import auth, analysis
 import dbmodels
 from database import engine
@@ -17,16 +18,24 @@ origins = [
     "http://localhost",
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    "http://136.117.27.55:3000",
 ]
 
 app.add_middleware(
     CORSMiddleware,
     # ★ 수정: ["*"] 대신 명시적인 origins 리스트 사용 (allow_credentials=True일 때 필수)
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# 1. 파일 저장할 폴더 만들기
+os.makedirs("static/resumes", exist_ok=True)
+# 2. 정적 파일 경로 마운트 (이게 있어야 브라우저에서 접근 가능)
+# 예: http://localhost:8000/static/resumes/15/홍길동.pdf 로 접속 가능해짐
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
 # --- ---
 
 # API 라우터 포함
