@@ -132,6 +132,10 @@ async def create_analysis(
 
                     # 요약문 생성 (그대로 유지)
                     raw_resume = item.get('Resume') or item.get('resume') or ""
+<<<<<<< HEAD
+=======
+
+>>>>>>> a139275886cc22cbe8b7012dcbc30dc7155312c0
 
                     # [추가] PDF 파일 URL 만들기
                     file_name = item.get('File_Name') or f"{item.get('Name')}.pdf"
