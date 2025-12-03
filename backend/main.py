@@ -1,6 +1,7 @@
 # FastAPI 실행. 모든 것 하나로 합치기.
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 import os
 from routers import auth, analysis
 import dbmodels
@@ -30,11 +31,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# 1. 파일 저장할 폴더 만들기
-os.makedirs("static/resumes", exist_ok=True)
-# 2. 정적 파일 경로 마운트 (이게 있어야 브라우저에서 접근 가능)
-# 예: http://localhost:8000/static/resumes/15/홍길동.pdf 로 접속 가능해짐
-app.mount("/static", StaticFiles(directory="static"), name="static")
+# 1. PDF를 저장할 실제 폴더 생성 (없으면 생성)
+UPLOAD_DIR = "static/pdfs"
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+# 2. '/pdfs' 주소로 요청이 오면 'static/pdfs' 폴더의 파일을 보여줌
+# 예: http://localhost:8000/pdfs/이력서.pdf
+app.mount("/pdfs", StaticFiles(directory=UPLOAD_DIR), name="pdfs")
 
 # --- ---
 
