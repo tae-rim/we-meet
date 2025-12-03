@@ -13,6 +13,9 @@ dbmodels.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
+os.makedirs("static", exist_ok=True)
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
 # --- CORS 설정 (중요 수정) ---
 # React 앱(3000번)과 통신하기 위한 허용 목록
 origins = [
@@ -31,21 +34,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# 1. PDF를 저장할 실제 폴더 생성 (없으면 생성)
-UPLOAD_DIR = "static/pdfs"
-os.makedirs(UPLOAD_DIR, exist_ok=True)
-
-# 2. '/pdfs' 주소로 요청이 오면 'static/pdfs' 폴더의 파일을 보여줌
-# 예: http://localhost:8000/pdfs/이력서.pdf
-app.mount("/pdfs", StaticFiles(directory=UPLOAD_DIR), name="pdfs")
-
-# --- ---
-
-# API 라우터 포함
-# --- 라우터 등록 ---
+# --- 3. 라우터 등록 ---
 app.include_router(auth.router, prefix="/auth", tags=["auth"])
-app.include_router(analysis.router, prefix="/api/analysis") # /api/analysis 포함
-# (참고) /api/templates 라우터도 만들어서 여기에 포함시키세요
+app.include_router(analysis.router, prefix="/api/analysis")
+
 
 @app.get("/")
 def read_root():

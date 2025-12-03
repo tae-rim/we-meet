@@ -45,6 +45,8 @@ class ApplicantResponse(BaseModel):
     Education: Optional[str] = Field(None, alias="education")
     Certification: Optional[str] = Field(None, alias="certification")
 
+    Keywords: Optional[str] = Field(None, alias="keywords")
+
     Resume: str = Field(..., alias="resume_summary")
     Pdf_Url: Optional[str] = Field(None, alias="pdf_url")
 

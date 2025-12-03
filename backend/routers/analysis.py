@@ -1,6 +1,6 @@
 # backend/routers/analysis.py
 
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, Request
 from sqlalchemy.orm import Session
 from typing import List
 import httpx 
@@ -132,6 +132,7 @@ async def create_analysis(
 
                     # 요약문 생성 (그대로 유지)
                     raw_resume = item.get('Resume') or item.get('resume') or ""
+                    safe_resume = raw_resume[:5000] if raw_resume else ""
 
                     # [추가] PDF 파일 URL 만들기
                     file_name = item.get('File_Name') or f"{item.get('Name')}.pdf"
@@ -139,6 +140,9 @@ async def create_analysis(
                     server_url = "http://136.117.27.55:8000" 
                     pdf_link = f"{server_url}/static/resumes/{db_job.id}/{file_name}"
                     
+                    # AI 결과에 'Keywords'가 있다면 가져오고, 없다면 자격증 내용을 대신 씁니다.
+                    keywords_str = item.get('Keywords') or item.get('keywords') or item.get('Certification') or ""
+
                     applicant = dbmodels.Applicant(
                         job_id=db_job.id,
                         
@@ -150,8 +154,10 @@ async def create_analysis(
                         job_role=item.get('Job Roles') or item.get('job_role'),
                         education=item.get('Degree') or item.get('degree'),
                         certification=item.get('Certification') or item.get('certification'),
-                        resume_summary=raw_resume,
-                        pdf_url=pdf_link
+                        resume_summary=safe_resume, 
+                        pdf_url=pdf_link,    
+
+                        keywords=keywords_str       
                     )
                     db.add(applicant)
                 
@@ -211,3 +217,4 @@ def get_analysis_history(
              .limit(limit)\
              .all()
     return jobs
+
