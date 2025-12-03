@@ -112,6 +112,7 @@ async def create_analysis(
                 for index, item in enumerate(final_results, 1):
                     if not isinstance(item, dict): continue
 
+                    raw_resume = item.get('Resume') or item.get('resume') or ""
                     safe_resume = raw_resume[:5000] if raw_resume else ""
 
                     file_name = item.get('File_Name') or f"{item.get('Name')}.pdf"
