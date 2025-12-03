@@ -7,7 +7,8 @@ import { fetchApplicantDetail } from '../api';
 
 // ★ [추가 1] React-PDF 라이브러리 및 스타일
 import { Document, Page, pdfjs } from 'react-pdf';
-
+import 'react-pdf/dist/Page/AnnotationLayer.css';
+import 'react-pdf/dist/Page/TextLayer.css';
 
 // ★ [추가 2] PDF Worker 설정 (필수)
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
@@ -47,17 +48,20 @@ export default function Dashboard3({ isLoggedIn, currentUser, onLogout }) {
 
 // ★ [핵심] 하이라이트 로직 (Custom Text Renderer)
   const highlightPattern = (textItem) => {
-    // 키워드가 없으면 그냥 글자만 리턴
-    if (!applicant || !applicant.keywords) return textItem.str;
+    // 1. applicant 데이터가 없으면 리턴
+    if (!applicant) return textItem.str;
 
-    // DB에 저장된 "Python, AWS, Master" 같은 문자열을 배열로 변환
-    const keywords = applicant.keywords.split(',').map(k => k.trim()).filter(k => k);
+    // 2. 하이라이트할 소스 찾기 (keywords가 없으면 certification, jobRole 순으로 대체)
+    // 이렇게 하면 DB 컬럼이 없어도 자격증 단어들이라도 하이라이트 됩니다.
+    const targetSource = applicant.keywords || applicant.certification || applicant.job_role || "";
+    
+    const keywords = targetSource.split(',').map(k => k.trim()).filter(k => k);
     if (keywords.length === 0) return textItem.str;
 
-    // 정규식으로 키워드 찾기 (대소문자 무시)
-    const regex = new RegExp(`(${keywords.join('|')})`, 'gi');
-    
-    // 매칭되는 부분을 <mark> 태그(노란 형광펜)로 감싸서 리턴
+    // (이하 정규식 로직 동일)
+    const escapedKeywords = keywords.map(k => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+    const regex = new RegExp(`(${escapedKeywords.join('|')})`, 'gi');
+
     return textItem.str.split(regex).map((part, index) => 
       regex.test(part) ? <mark key={index} style={{ backgroundColor: '#ffeb3b' }}>{part}</mark> : part
     );
@@ -173,11 +177,35 @@ const getJobTagClass = (role) => {
           </div>
 
           {/* 3-2. 오른쪽: 이력서 원본 */}
-          <div className="col-span-2 bg-gray-200 rounded-lg flex items-center justify-center min-h-[calc(100vh-160px)]">
-            {/* 나중에 실제 이력서 PDF/이미지를 렌더링할 컴포넌트가 
-              여기에 들어갑니다. (예: <iframe src={applicant.resumeUrl} />)
-            */}
-            <span className="text-gray-500 font-medium">이력서 원본 (PDF 뷰어 영역)</span>
+          <div className="col-span-2 bg-gray-200 rounded-lg flex flex-col items-center p-4 min-h-[calc(100vh-160px)] max-h-[calc(100vh-160px)] overflow-y-auto shadow-inner border border-gray-300">
+            
+            {pdfUrl ? (
+              <Document
+                file={pdfUrl}
+                onLoadSuccess={onDocumentLoadSuccess}
+                loading={<div className="mt-10 text-gray-500">이력서를 불러오는 중...</div>}
+                error={<div className="mt-10 text-red-500">PDF 파일을 불러올 수 없습니다.</div>}
+                className="flex flex-col gap-4"
+              >
+                {/* 페이지 수만큼 반복해서 렌더링 */}
+                {Array.from(new Array(numPages), (el, index) => (
+                  <div key={`page_${index + 1}`} className="shadow-lg">
+                    <Page
+                      pageNumber={index + 1}
+                      width={700} // 화면 크기에 맞춰 조절
+                      customTextRenderer={highlightPattern} // ★ 하이라이트 함수 연결
+                      renderTextLayer={true}
+                      renderAnnotationLayer={false} 
+                    />
+                  </div>
+                ))}
+              </Document>
+            ) : (
+              <div className="flex flex-col items-center justify-center h-full text-gray-500">
+                <p className="text-lg font-medium">PDF 파일이 없습니다.</p>
+                <p className="text-sm">분석 결과에 파일 정보가 없습니다.</p>
+              </div>
+            )}
           </div>
 
         </main>
