@@ -7,8 +7,7 @@ import { fetchApplicantDetail } from '../api';
 
 // ★ [추가 1] React-PDF 라이브러리 및 스타일
 import { Document, Page, pdfjs } from 'react-pdf';
-import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
-import 'react-pdf/dist/esm/Page/TextLayer.css';
+
 
 // ★ [추가 2] PDF Worker 설정 (필수)
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
