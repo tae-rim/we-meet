@@ -6,7 +6,7 @@ import Sidebar from '../components/Sidebar';
 import { fetchApplicantDetail } from '../api';
 
 // ★ [추가 1] React-PDF 라이브러리 및 스타일
-import { Document, Page, pdfjs } from 'react-pdf';
+import { Document, Page, pdfjs } from 'react-pdf/dist/esm/entry.webpack';
 
 
 // ★ [추가 2] PDF Worker 설정 (필수)
