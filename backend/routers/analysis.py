@@ -47,25 +47,28 @@ async def create_analysis(
     upload_dir = f"static/resumes/{db_job.id}"
     os.makedirs(upload_dir, exist_ok=True)
 
-    # 2. 파일 준비
+    # 3. 파일 처리 (압축 해제)
     ai_files = []
+    saved_filenames = []  # 실제 저장된 파일명들을 기억해둡니다.
+
     for f in files:
-    # 1) 일단 내용을 읽음 (AI 전송용)
         file_content = await f.read()
         ai_files.append(('file', (f.filename, file_content, f.content_type)))
         
-        # 2) 로컬에 ZIP 파일 저장
         zip_path = os.path.join(upload_dir, f.filename)
         with open(zip_path, "wb") as buffer:
             buffer.write(file_content)
             
-        # 3) 압축 풀기
         try:
             with zipfile.ZipFile(zip_path, 'r') as zip_ref:
                 zip_ref.extractall(upload_dir)
-            print(f"✅ 압축 해제 완료: {upload_dir}")
+                # 압축 풀린 파일 이름들을 리스트에 담습니다 (숨김파일 제외)
+                saved_filenames = [name for name in zip_ref.namelist() if not name.startswith('__') and not name.startswith('.')]
+            print(f"✅ 압축 해제 및 파일 목록: {saved_filenames}")
         except Exception as e:
-            print(f"⚠️ 압축 해제 실패 (PDF 아닐 수 있음): {e}")
+            print(f"⚠️ 압축 해제 실패: {e}")
+            # 압축파일이 아닐 경우 그냥 원본 파일명을 사용
+            saved_filenames.append(f.filename)
 
     
     
@@ -134,14 +137,33 @@ async def create_analysis(
                     raw_resume = item.get('Resume') or item.get('resume') or ""
                     safe_resume = raw_resume[:5000] if raw_resume else ""
 
-                    # [추가] PDF 파일 URL 만들기
-                    file_name = item.get('File_Name') or f"{item.get('Name')}.pdf"
+                    # (1) 이름 가져오기
+                    applicant_name = item.get('Name') or item.get('name') or "Unknown"
+
+                    # (2) PDF 파일 찾기 로직 (AI가 파일명을 안 줘도 우리가 찾는다!)
+                    # 저장된 파일 목록(saved_filenames) 중에서 지원자 이름이 포함된 파일 찾기
+                    matched_filename = f"{applicant_name}.pdf" # 기본값
                     
-                    server_url = "http://136.117.27.55:8000" 
-                    pdf_link = f"{server_url}/static/resumes/{db_job.id}/{file_name}"
+                    # 파일 목록을 순회하며 이름이 포함된 파일이 있는지 확인 (대소문자 무시)
+                    for local_file in saved_filenames:
+                        # 예: local_file="홍길동_이력서.pdf", applicant_name="홍길동" -> 매칭 성공
+                        if applicant_name.lower().replace(" ", "") in local_file.lower().replace(" ", ""):
+                            matched_filename = local_file
+                            break
+                    
+                    my_server_url = "http://136.117.27.55:8000" 
+                    pdf_link = f"{my_server_url}/{upload_dir}/{matched_filename}"
                     
                     # AI 결과에 'Keywords'가 있다면 가져오고, 없다면 자격증 내용을 대신 씁니다.
-                    keywords_str = item.get('Keywords') or item.get('keywords') or item.get('Certification') or ""
+                    ai_keywords = item.get('Keywords') or item.get('keywords')
+                    certifications = item.get('Certification') or item.get('certification') or ""
+
+                    if ai_keywords:
+                        # 리스트면 문자열로, 문자열이면 그대로
+                        keywords_str = ", ".join(ai_keywords) if isinstance(ai_keywords, list) else str(ai_keywords)
+                    else:
+                        # 키워드가 없으면 자격증 정보를 키워드로 사용 (하이라이팅됨)
+                        keywords_str = str(certifications)
 
                     applicant = dbmodels.Applicant(
                         job_id=db_job.id,
@@ -155,9 +177,8 @@ async def create_analysis(
                         education=item.get('Degree') or item.get('degree'),
                         certification=item.get('Certification') or item.get('certification'),
                         resume_summary=safe_resume, 
-                        pdf_url=pdf_link,    
-
-                        keywords=keywords_str       
+                        pdf_url=pdf_link,
+                        keywords=keywords_str    
                     )
                     db.add(applicant)
                 
