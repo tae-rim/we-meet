@@ -15,8 +15,8 @@
     "react-scripts": "5.0.1",
     "web-vitals": "^2.1.4",
     "react-pdf": "^10.2.0",
-    "@react-pdf-viewer/core": "^4.0.0",
-    "@react-pdf-viewer/default-layout": "^4.0.0"    
+    "@react-pdf-viewer/core": "^3.12.1",
+    "@react-pdf-viewer/default-layout": "^3.12.1"    
   },
   "scripts": {
     "start": "react-scripts start",
