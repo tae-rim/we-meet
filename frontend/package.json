@@ -13,7 +13,10 @@
     "react-dropzone": "^14.3.8",
     "react-router-dom": "^7.9.4",
     "react-scripts": "5.0.1",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "react-pdf": "^6.2.2",
+    "@react-pdf-viewer/core": "^4.0.0",
+    "@react-pdf-viewer/default-layout": "^4.0.0"    
   },
   "scripts": {
     "start": "react-scripts start",
