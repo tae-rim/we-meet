@@ -48,24 +48,30 @@ export default function Dashboard3({ isLoggedIn, currentUser, onLogout }) {
 
 // ★ [핵심] 하이라이트 로직 (Custom Text Renderer)
   const highlightPattern = (textItem) => {
+    console.log("TextRenderer 실행중:", textItem.str);    
     // 1. applicant 데이터가 없으면 리턴
     if (!applicant) return textItem.str;
-    // 1. 검색할 키워드 문자열 가져오기 (DB에 키워드가 없으면 자격증, 직무 내용 가져옴)
-    const sourceString = applicant.keywords || applicant.Keywords || applicant.certification || applicant.job_role || "";
+    // 1. 모든 소스(키워드, 자격증, 직무)를 다 합칩니다.
+    const sourceString = [
+      applicant.keywords, 
+      applicant.Keywords, 
+      applicant.certification, 
+      applicant.Certification,
+      applicant.job_role, 
+      applicant.Job_Roles
+    ].filter(Boolean).join(" "); // null이나 undefined 제외하고 문자열로 합침
 
-    // 2. 단어 단위로 쪼개기 (콤마(,)와 공백( )을 모두 기준으로 자름)
-    // 예: "Oracle Java Certification" -> ["Oracle", "Java", "Certification"] 으로 분리됨
+    // 2. 단어 단위로 쪼개기 (쉼표, 공백 기준)
     const keywords = sourceString
       .split(/[, ]+/) 
       .map(k => k.trim())
-      .filter(k => k.length > 2); // 2글자 이하(a, an, of 등)는 너무 많이 칠해지니 제외
+      .filter(k => k.length > 2); // 2글자 이하(is, a, to 등) 제외
 
     if (keywords.length === 0) return textItem.str;
 
     try {
       // 3. 정규식 생성 (특수문자 처리 포함)
       const escapedKeywords = keywords.map(k => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
-      // 단어들이 포함된 정규식 (대소문자 무시 'gi')
       const regex = new RegExp(`(${escapedKeywords.join('|')})`, 'gi');
 
       // 4. 텍스트에서 키워드 찾아서 형광펜(<mark>) 씌우기
@@ -79,11 +85,10 @@ export default function Dashboard3({ isLoggedIn, currentUser, onLogout }) {
         )
       );
     } catch (e) {
-      // 정규식 에러 방지
       return textItem.str;
     }
   };
-
+  
   if (loading) return <div className="p-12 text-center text-lg">데이터를 불러오는 중...</div>;
 
   // 3. 지원자 정보가 없을 경우 (예: 잘못된 URL)
