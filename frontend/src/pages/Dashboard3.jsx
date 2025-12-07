@@ -50,17 +50,24 @@ export default function Dashboard3({ isLoggedIn, currentUser, onLogout }) {
   const highlightPattern = (textItem) => {
     // 1. applicant 데이터가 없으면 리턴
     if (!applicant) return textItem.str;
+    let keywords = [];
 
-    // 2. 하이라이트할 소스 찾기 (keywords가 없으면 certification, jobRole 순으로 대체)
-    // 이렇게 하면 DB 컬럼이 없어도 자격증 단어들이라도 하이라이트 됩니다.
-    const targetSource = applicant.keywords || applicant.certification || applicant.job_role || "";
-    
-    const keywords = targetSource.split(',').map(k => k.trim()).filter(k => k);
+    // 1순위: 백엔드에서 받은 키워드 사용
+    if (applicant.keywords || applicant.Keywords) {
+      const source = applicant.keywords || applicant.Keywords;
+      keywords = source.split(',').map(k => k.trim());
+    } 
+    // 2순위: 키워드가 없다면 직무/자격증 단어를 쪼개서 사용 (띄어쓰기 기준)
+    else {
+      const roles = (applicant.job_role || applicant.Job_Roles || "").split(" ");
+      const certs = (applicant.certification || applicant.Certification || "").split(" ");
+      keywords = [...roles, ...certs];
+    }
+
+    // 2글자 이하의 짧은 단어는 제외 (너무 많이 칠해지는 것 방지)
+    keywords = keywords.filter(k => k && k.length > 2);
+
     if (keywords.length === 0) return textItem.str;
-
-    // (이하 정규식 로직 동일)
-    const escapedKeywords = keywords.map(k => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
-    const regex = new RegExp(`(${escapedKeywords.join('|')})`, 'gi');
 
     return textItem.str.split(regex).map((part, index) => 
       regex.test(part) ? <mark key={index} style={{ backgroundColor: '#ffeb3b' }}>{part}</mark> : part
