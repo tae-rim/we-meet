@@ -266,6 +266,6 @@ const InfoCard = ({ title, value }) => (
 const InfoCardLong = ({ title, text }) => (
   <div className="w-full bg-white p-6 rounded-lg shadow-sm border border-gray-100">
     <p className="text-sm font-medium text-gray-500">{title}</p>
-    <p className="text-base text-gray-800 mt-3 leading-relaxed whitespace-pre-line">{text}</p>
+    <p className="text-base text-gray-800 mt-3 leading-relaxed">{text}</p>
   </div>
 );
