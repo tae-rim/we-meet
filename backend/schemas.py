@@ -69,7 +69,8 @@ class Applicant(BaseModel):
     job_role: Optional[str] = None
     
     education: Optional[str] = None      
-    certification: Optional[str] = None  
+    certification: Optional[str] = None 
+    keywords: Optional[str] = None 
     
     resume_summary: Optional[str] = None
     pdf_url: Optional[str] = None
