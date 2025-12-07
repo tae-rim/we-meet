@@ -51,33 +51,48 @@ export default function Dashboard3({ isLoggedIn, currentUser, onLogout }) {
     console.log("TextRenderer 실행중:", textItem.str);    
     // 1. applicant 데이터가 없으면 리턴
     if (!applicant) return textItem.str;
-    // 1. 모든 소스(키워드, 자격증, 직무)를 다 합칩니다.
-    const sourceString = [
-      applicant.keywords, 
-      applicant.Keywords, 
-      applicant.certification, 
-      applicant.Certification,
-      applicant.job_role, 
-      applicant.Job_Roles
-    ].filter(Boolean).join(" "); // null이나 undefined 제외하고 문자열로 합침
+    // 1. 요청하신 4가지 필드(직무, 학력, 자격증, 요약)의 값을 모두 가져옵니다.
+    // 데이터 키값의 대소문자 가능성을 모두 고려해 안전하게 가져옵니다.
+    const targetValues = [
+      applicant.job_role || applicant.Job_Roles,
+      applicant.education || applicant.Education,
+      applicant.certification || applicant.Certification,
+      applicant.resume_summary || applicant.Resume
+    ];
 
-    // 2. 단어 단위로 쪼개기 (쉼표, 공백 기준)
-    const keywords = sourceString
-      .split(/[, ]+/) 
-      .map(k => k.trim())
-      .filter(k => k.length > 2); // 2글자 이하(is, a, to 등) 제외
+    // 2. 값들을 하나의 긴 문자열로 합칩니다. (null이나 빈 값 제거)
+    const combinedText = targetValues
+      .filter(val => val && typeof val === 'string' && val.trim() !== '')
+      .join(" ");
 
-    if (keywords.length === 0) return textItem.str;
+    // 3. 텍스트를 단어 단위로 쪼개고 정제합니다.
+    // - 공백, 줄바꿈(\n), 콤마 등으로 분리
+    // - 2글자 이하의 너무 흔한 단어(a, is, of 등)는 하이라이트 노이즈가 되므로 제외
+    const keywords = combinedText
+      .split(/[\s,.\n]+/) 
+      .map(word => word.trim())
+      .filter(word => word.length > 2);
+
+    // 중복 단어 제거 (성능 최적화)
+    const uniqueKeywords = [...new Set(keywords)];
+
+    if (uniqueKeywords.length === 0) return textItem.str;
 
     try {
-      // 3. 정규식 생성 (특수문자 처리 포함)
-      const escapedKeywords = keywords.map(k => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+      // 4. 정규식 생성 (특수문자 이스케이프 처리)
+      // 대소문자 구분 없이(gi) 찾습니다.
+      const escapedKeywords = uniqueKeywords.map(k => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
       const regex = new RegExp(`(${escapedKeywords.join('|')})`, 'gi');
 
-      // 4. 텍스트에서 키워드 찾아서 형광펜(<mark>) 씌우기
-      return textItem.str.split(regex).map((part, index) => 
+      // 5. 현재 렌더링 중인 PDF 텍스트 조각(textItem.str)에 키워드가 있는지 확인
+      const parts = textItem.str.split(regex);
+
+      // 매칭되는 부분이 없으면 원본 그대로 반환 (성능 위함)
+      if (parts.length === 1) return textItem.str;
+
+      return parts.map((part, index) => 
         regex.test(part) ? (
-          <mark key={index} style={{ backgroundColor: '#ffeb3b', color: 'black' }}>
+          <mark key={index} style={{ backgroundColor: '#ffeb3b', color: 'black', padding: '0 1px' }}>
             {part}
           </mark>
         ) : (
@@ -85,6 +100,7 @@ export default function Dashboard3({ isLoggedIn, currentUser, onLogout }) {
         )
       );
     } catch (e) {
+      console.error("Highlight Error:", e);
       return textItem.str;
     }
   };
@@ -250,6 +266,6 @@ const InfoCard = ({ title, value }) => (
 const InfoCardLong = ({ title, text }) => (
   <div className="w-full bg-white p-6 rounded-lg shadow-sm border border-gray-100">
     <p className="text-sm font-medium text-gray-500">{title}</p>
-    <p className="text-base text-gray-800 mt-3 leading-relaxed">{text}</p>
+    <p className="text-base text-gray-800 mt-3 leading-relaxed whitespace-pre-line">{text}</p>
   </div>
 );
