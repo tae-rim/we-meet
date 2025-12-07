@@ -52,27 +52,31 @@ export default function Dashboard3({ isLoggedIn, currentUser, onLogout }) {
     if (!applicant) return textItem.str;
     let keywords = [];
 
-    // 1순위: 백엔드에서 받은 키워드 사용
     if (applicant.keywords || applicant.Keywords) {
       const source = applicant.keywords || applicant.Keywords;
       keywords = source.split(',').map(k => k.trim());
-    } 
-    // 2순위: 키워드가 없다면 직무/자격증 단어를 쪼개서 사용 (띄어쓰기 기준)
-    else {
+    } else {
       const roles = (applicant.job_role || applicant.Job_Roles || "").split(" ");
       const certs = (applicant.certification || applicant.Certification || "").split(" ");
       keywords = [...roles, ...certs];
     }
 
-    // 2글자 이하의 짧은 단어는 제외 (너무 많이 칠해지는 것 방지)
     keywords = keywords.filter(k => k && k.length > 2);
 
     if (keywords.length === 0) return textItem.str;
 
-    return textItem.str.split(regex).map((part, index) => 
-      regex.test(part) ? <mark key={index} style={{ backgroundColor: '#ffeb3b' }}>{part}</mark> : part
+    const escapedKeywords = keywords.map(k =>
+      k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
     );
-  };
+
+    const regex = new RegExp(`(${escapedKeywords.join('|')})`, 'gi');
+
+    return textItem.str.split(regex).map((part, index) =>
+      escapedKeywords.some(k => part.toLowerCase().includes(k.toLowerCase()))
+        ? <mark key={index} style={{ backgroundColor: '#ffeb3b' }}>{part}</mark>
+        : part
+);
+};
 
   if (loading) return <div className="p-12 text-center text-lg">데이터를 불러오는 중...</div>;
 
