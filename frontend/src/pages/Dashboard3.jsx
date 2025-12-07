@@ -48,9 +48,9 @@ export default function Dashboard3({ isLoggedIn, currentUser, onLogout }) {
 
 // ★ [핵심] 하이라이트 로직 (Custom Text Renderer)
   const highlightPattern = (textItem) => {
+    console.log("TextRenderer 실행중:", textItem.str);
     // 1. applicant 데이터가 없으면 리턴
     if (!applicant) return textItem.str;
-
     // 1. 검색할 키워드 문자열 가져오기 (DB에 키워드가 없으면 자격증, 직무 내용 가져옴)
     const sourceString = applicant.keywords || applicant.Keywords || applicant.certification || applicant.job_role || "";
 
