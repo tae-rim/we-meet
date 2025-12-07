@@ -48,6 +48,7 @@ export default function Dashboard3({ isLoggedIn, currentUser, onLogout }) {
 
 // ★ [핵심] 하이라이트 로직 (Custom Text Renderer)
   const highlightPattern = (textItem) => {
+    console.log("TextRenderer 실행중:", textItem.str);
     // 1. applicant 데이터가 없으면 리턴
     if (!applicant) return textItem.str;
     let keywords = [];
