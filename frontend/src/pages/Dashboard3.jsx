@@ -96,6 +96,7 @@ export default function Dashboard3({ isLoggedIn, currentUser, onLogout }) {
   const certification = applicant.Certification || applicant.certification || "정보 없음";
   const resumeSummary = applicant.Resume || applicant.resume_summary || "요약 정보가 없습니다.";
   const pdfUrl = applicant.Pdf_Url || applicant.pdf_url;
+  const safePdfUrl = encodeURI(pdfUrl);
 
   // 4. 지원자 정보가 있을 경우 (정상 화면)
 const getJobTagClass = (role) => {
@@ -181,7 +182,7 @@ const getJobTagClass = (role) => {
             
             {pdfUrl ? (
               <Document
-                file={pdfUrl}
+                file={safePdfUrl}
                 onLoadSuccess={onDocumentLoadSuccess}
                 loading={<div className="mt-10 text-gray-500">이력서를 불러오는 중...</div>}
                 error={<div className="mt-10 text-red-500">PDF 파일을 불러올 수 없습니다.</div>}
@@ -191,6 +192,7 @@ const getJobTagClass = (role) => {
                 {Array.from(new Array(numPages), (el, index) => (
                   <div key={`page_${index + 1}`} className="shadow-lg">
                     <Page
+                      key={`page_${index + 1}_${applicant?.keywords ? 'loaded' : 'loading'}`}        
                       pageNumber={index + 1}
                       width={700} // 화면 크기에 맞춰 조절
                       customTextRenderer={highlightPattern} // ★ 하이라이트 함수 연결
