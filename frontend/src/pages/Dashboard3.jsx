@@ -48,7 +48,7 @@ export default function Dashboard3({ isLoggedIn, currentUser, onLogout }) {
 
 // ★ [핵심] 하이라이트 로직 (Custom Text Renderer)
   const highlightPattern = (textItem) => {
-    console.log("TextRenderer 실행중:", textItem.str);
+    console.log("TextRenderer 실행중:", textItem.str);    
     // 1. applicant 데이터가 없으면 리턴
     if (!applicant) return textItem.str;
     // 1. 모든 소스(키워드, 자격증, 직무)를 다 합칩니다.
@@ -88,7 +88,7 @@ export default function Dashboard3({ isLoggedIn, currentUser, onLogout }) {
       return textItem.str;
     }
   };
-
+  
   if (loading) return <div className="p-12 text-center text-lg">데이터를 불러오는 중...</div>;
 
   // 3. 지원자 정보가 없을 경우 (예: 잘못된 URL)
