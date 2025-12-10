@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { ArrowIcon } from "../components/IconSet"; // PascalCase
 import { useNavigate } from "react-router-dom";
 // 얘는 Dashboard1의 컴포넌트인 느낌. 그래서 Header와 Sidebar는 Dashboard1에서 불러쓰는걸로.
+ // <-- API 함수 import
+import { fetchAnalysisResults, fetchAnalysisJob } from '../api';
 
-import { fetchAnalysisResults } from '../api'; // <-- API 함수 import
 
 /**
  * 분석 완료 리포트 컴포넌트 (Dashboard1이 100% 완료되면 렌더링됨)
