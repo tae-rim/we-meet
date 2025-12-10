@@ -94,3 +94,8 @@ export const fetchHistoryList = async () => {
   const response = await apiClient.get("/api/analysis/history/all");
   return response.data;
 };
+
+export const fetchAnalysisJob = async (jobId) => {
+  const response = await apiClient.get(`/api/analysis/${jobId}`);
+  return response.data;
+};

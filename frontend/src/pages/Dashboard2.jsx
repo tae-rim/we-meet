@@ -14,6 +14,7 @@ export default function Dashboard2() {
 
     // ✅ 1) 서버에서 가져온 데이터를 저장할 state
   const [applicants, setApplicants] = useState([]);
+  const [totalCount, setTotalCount] = useState(0);
 
   // ✅ 2) 컴포넌트가 켜질 때 API 요청
   useEffect(() => {
@@ -24,6 +25,20 @@ export default function Dashboard2() {
         console.log(`Job ID ${storedId}의 데이터를 불러옵니다...`);
 
         const result = await fetchAnalysisResults(storedId);
+
+        // 2. 작업 메타데이터 가져오기 (전체 지원자 수 포함)
+        // fetchAnalysisJob 함수가 api.js에 추가되었으므로 호출 가능
+        const jobInfo = await fetchAnalysisJob(storedId);
+        setTotalCount(jobInfo.total_count); // DB에 저장된 전체 수
+
+        // jobInfo가 존재하고 total_count가 있는 경우에만 설정
+        if (jobInfo && jobInfo.total_count !== undefined) {
+             setTotalCount(jobInfo.total_count);
+        } else {
+             // 만약 API가 없거나 에러가 나면, 현재 리스트 길이로 대체하거나 0으로 설정
+             // 여기서는 현재 리스트 길이로 대체 (임시 방편)
+             setTotalCount(result.length); 
+        }
 
         const sortedResult = [...result].sort((a, b) => {
              const scoreA = a.Score || a.score || 0;
@@ -59,9 +74,16 @@ export default function Dashboard2() {
         </div>
 
         {/* 1-1. 통계 박스 3개 */}
+        {/* 1. 전체 지원자 수 (DB에서 가져온 값) */}
+        <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100">
+          <p className="text-gray-500">전체 지원자 수</p>
+          <h3 className="text-3xl font-bold text-gray-800 mt-2">
+            {totalCount} <span className="text-xl font-medium">명</span>
+          </h3>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100">
-            <p className="text-gray-500">전체 지원자 수</p>
+            <p className="text-gray-500">선택된 직무의 지원자 수</p>
             <h3 className="text-3xl font-bold text-gray-800 mt-2">
               {applicants.length} <span className="text-xl font-medium">명</span>
             </h3>

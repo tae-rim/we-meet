@@ -30,7 +30,8 @@ class AnalysisJob(Base):
     title = Column(String(255), nullable=True)      # 직무 (예: Software Engineer)
     degree = Column(String(255), nullable=True)     # 학위
     license = Column(String(255), nullable=True)    # 자격증
-    criteria = Column(Text, nullable=True)          # 상세 요건
+    criteria = Column(Text, nullable=True)
+    total_count = Column(Integer, default=0)          # 상세 요건
 
     owner = relationship("User", back_populates="analysis_jobs")
     applicants = relationship("Applicant", back_populates="job")

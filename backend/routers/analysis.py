@@ -106,6 +106,7 @@ async def create_analysis(
                 elif isinstance(results_json, list):
                     final_results = results_json
                 
+                total_applicants_count = len(final_results)
                 # ---------------------------------------------------------
                 # ★ 수정 3: [강력 필터링] 직무가 선택되었다면, 다른 직무는 제거
                 # ---------------------------------------------------------
@@ -158,12 +159,17 @@ async def create_analysis(
                     ai_keywords = item.get('Keywords') or item.get('keywords')
                     certifications = item.get('Certification') or item.get('certification') or ""
 
-                    if ai_keywords:
-                        # 리스트면 문자열로, 문자열이면 그대로
-                        keywords_str = ", ".join(ai_keywords) if isinstance(ai_keywords, list) else str(ai_keywords)
-                    else:
-                        # 키워드가 없으면 자격증 정보를 키워드로 사용 (하이라이팅됨)
-                        keywords_str = str(certifications)
+                    mix_target = [
+                        applicant_name,
+                        item.get('Job Roles') or item.get('job_role') or "",
+                        item.get('Degree') or item.get('degree') or "",
+                        item.get('Certification') or item.get('certification') or "",
+                        # AI가 준 키워드가 있다면 그것도 포함
+                        ", ".join(item.get('Keywords', [])) if isinstance(item.get('Keywords'), list) else (item.get('Keywords') or "")
+                    ]
+                    
+                    # 모든 텍스트를 공백으로 이어 붙임
+                    keywords_str = " ".join([str(x) for x in mix_target if x])
 
                     applicant = dbmodels.Applicant(
                         job_id=db_job.id,
@@ -184,6 +190,7 @@ async def create_analysis(
                 
                 db_job.status = "COMPLETED"
                 db_job.progress = 100
+                db_job.total_count = total_applicants_count                
                 db.add(db_job)
                 db.commit()
                 db.refresh(db_job)
@@ -238,4 +245,12 @@ def get_analysis_history(
              .limit(limit)\
              .all()
     return jobs
+
+# 6. 특정 분석 작업의 메타데이터 조회 (전체 인원수 등)
+@router.get("/{id}", response_model=schemas.AnalysisJob)
+def get_analysis_job(id: int, db: Session = Depends(get_db)):
+    job = db.query(dbmodels.AnalysisJob).filter(dbmodels.AnalysisJob.id == id).first()
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+    return job
 

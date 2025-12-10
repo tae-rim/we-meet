@@ -56,6 +56,7 @@ class AnalysisJob(BaseModel):
     id: int
     status: str
     progress: int
+    total_count: Optional[int] = 0
     # applicants: List[ApplicantResponse] = [] # 리스트 포함 시
 
     model_config = ConfigDict(from_attributes=True)
