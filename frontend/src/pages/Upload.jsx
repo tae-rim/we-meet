@@ -89,8 +89,7 @@ const handleAnalysisStart = async () => {
       isAnalyzing || 
       uploadedFiles.length === 0 || 
       criteria.trim() === "" || 
-      job === "" || 
-      degree === "";
+      job === "";
 
 
   return (
