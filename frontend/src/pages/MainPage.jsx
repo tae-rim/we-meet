@@ -1,5 +1,4 @@
 import React from "react";
-// Header 컴포넌트 import 경로를 소문자 'h' (header.jsx)로 수정합니다.
 import Header from "../components/Header";
 
 // 첫 번째 섹션 (Hero)

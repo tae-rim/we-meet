@@ -1,5 +1,7 @@
 # we-meet
 
+### 아래는 로컬에서 돌릴 때만 적용 가능함.
+
 ### 원하는 폴더 위치에서
 ```bash
 git clone https://github.com/tae-rim/we-meet.git

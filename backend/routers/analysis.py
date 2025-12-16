@@ -25,232 +25,138 @@ router = APIRouter(
 async def create_analysis(
     files: List[UploadFile] = File(...),
     criteria: str = Form(...),
-    job: str = Form(""),       # 사용자 입력: "Software Engineer"
-    degree: str = Form(""),    # 사용자 입력: "Master"
-    license: str = Form(""),   # 사용자 입력: "AWS..."
+    job: str = Form(""),
+    degree: str = Form(""),
+    license: str = Form(""),
     db: Session = Depends(get_db),
-    current_user: schemas.User = Depends(get_current_user) # 로그인 유저
+    current_user: schemas.User = Depends(get_current_user)
 ):
-    # 1. DB 저장 (기록용)
-    # ★ 수정 1: 변수명을 'db_job'으로 분리 (변수명 충돌 방지)
+    # 1) DB 저장
     db_job = crud.create_analysis_job(
         db, 
-        owner_id=current_user.id, 
-        title=job,     
+        owner_id=current_user.id,
+        title=job,
         degree=degree,
         license=license,
         criteria=criteria
-    ) 
+    )
 
-    # 2. 파일 저장 및 압축 해제 로직 (★ 추가된 부분)
-    # 저장할 폴더: static/resumes/{job_id}/
+    # 2) 파일 저장 & 압축 풀기
     upload_dir = f"static/resumes/{db_job.id}"
     os.makedirs(upload_dir, exist_ok=True)
 
-    # 3. 파일 처리 (압축 해제)
     ai_files = []
-    saved_filenames = []  # 실제 저장된 파일명들을 기억해둡니다.
+    saved_filenames = []
 
     for f in files:
         file_content = await f.read()
         ai_files.append(('file', (f.filename, file_content, f.content_type)))
-        
+
         zip_path = os.path.join(upload_dir, f.filename)
         with open(zip_path, "wb") as buffer:
             buffer.write(file_content)
-            
+
         try:
             with zipfile.ZipFile(zip_path, 'r') as zip_ref:
                 zip_ref.extractall(upload_dir)
-                # 압축 풀린 파일 이름들을 리스트에 담습니다 (숨김파일 제외)
-                saved_filenames = [name for name in zip_ref.namelist() if not name.startswith('__') and not name.startswith('.')]
-            print(f"✅ 압축 해제 및 파일 목록: {saved_filenames}")
-        except Exception as e:
-            print(f"⚠️ 압축 해제 실패: {e}")
-            # 압축파일이 아닐 경우 그냥 원본 파일명을 사용
+                saved_filenames = [
+                    name for name in zip_ref.namelist()
+                    if not name.startswith('__') and not name.startswith('.')
+                ]
+        except:
             saved_filenames.append(f.filename)
 
-    
-    
-    # 3. [핵심] 프롬프트 생성 (변수 직접 사용!)
-    # ★ 수정 2: db_job.title 대신 입력받은 'job' 문자열을 바로 사용
-    combined_prompt = (
-        f"IMPORTANT REQUIREMENTS:\n"
-        f"1. Must match Job Role: {job} {job} {job}\n"  # 3번 강조
-        f"2. Required Degree: {degree}\n"
-        f"3. Preferred Certification: {license}\n"
-        f"4. Detailed Criteria: {criteria}"
-    )
+    # 3) 프롬프트 생성
+    combined_prompt = f"""
+IMPORTANT REQUIREMENTS:
+- Job Role: {job}
+- Required Degree: {degree}
+- Certification: {license}
+- Criteria: {criteria}
+"""
 
-    data = {'job_description': combined_prompt}
-    
-    # 디버깅 로그
-    print("\n" + "="*50)
-    print(f"🎯 [AI 입력 확인] 직무: {job}, 학위: {degree}, 자격증: {license}")
-    print(f"📝 [생성된 프롬프트]:\n{combined_prompt}")
-    print("="*50 + "\n")
+    data = {"job_description": combined_prompt}
 
+    # 4) AI 서버 요청
     try:
-        print(f"DEBUG: AI 서버({AI_SERVER_URL})로 전송 시도...")
         async with httpx.AsyncClient(timeout=300.0) as client:
             response = await client.post(AI_SERVER_URL, files=ai_files, data=data)
-            
-            if response.status_code == 200:
-                print("DEBUG: AI 분석 성공!")
-                results_json = response.json()
-                
-                final_results = []
-                if isinstance(results_json, dict):
-                    if 'data' in results_json: final_results = results_json['data']
-                    elif 'results' in results_json: final_results = results_json['results']
-                elif isinstance(results_json, list):
-                    final_results = results_json
-                
-                total_applicants_count = len(final_results)
-                # ---------------------------------------------------------
-                # ★ 수정 3: [강력 필터링] 직무가 선택되었다면, 다른 직무는 제거
-                # ---------------------------------------------------------
-                if job and job.strip() != "":
-                    print(f"⚔️ 필터링 시작: '{job}' 가 포함된 지원자만 남깁니다.")
-                    filtered_list = []
-                    target_job_clean = job.lower().replace(" ", "") 
-                    
-                    for item in final_results:
-                        if not isinstance(item, dict): continue
-                        
-                        candidate_role = item.get('Job Roles', '') or item.get('Job Role', '')
-                        candidate_role_clean = candidate_role.lower().replace(" ", "")
-                        
-                        # 포함 여부 확인
-                        if target_job_clean in candidate_role_clean:
-                            filtered_list.append(item)
-                    
-                    final_results = filtered_list
-                    print(f"✅ 필터링 완료: {len(final_results)}명 남음")
-                # ---------------------------------------------------------
 
-                # 4. DB 저장 (여기서 순위를 다시 매깁니다!)
-                # enumerate(final_results, 1) -> 1번부터 번호를 새로 붙입니다.
-                for index, item in enumerate(final_results, 1):
-                    if not isinstance(item, dict): continue
+            if response.status_code != 200:
+                raise HTTPException(status_code=500, detail=f"AI Error: {response.text}")
 
-                    # 요약문 생성 (그대로 유지)
-                    raw_resume = item.get('Resume') or item.get('resume') or ""
-                    safe_resume = raw_resume[:5000] if raw_resume else ""
+            ai_json = response.json()
+            print("AI JSON 원본:", ai_json)
 
-                    # (1) 이름 가져오기
-                    applicant_name = item.get('Name') or item.get('name') or "Unknown"
-
-                    # (2) PDF 파일 찾기 로직 (AI가 파일명을 안 줘도 우리가 찾는다!)
-                    # 저장된 파일 목록(saved_filenames) 중에서 지원자 이름이 포함된 파일 찾기
-                    matched_filename = f"{applicant_name}.pdf" # 기본값
-                    
-                    # 파일 목록을 순회하며 이름이 포함된 파일이 있는지 확인 (대소문자 무시)
-                    for local_file in saved_filenames:
-                        # 예: local_file="홍길동_이력서.pdf", applicant_name="홍길동" -> 매칭 성공
-                        if applicant_name.lower().replace(" ", "") in local_file.lower().replace(" ", ""):
-                            matched_filename = local_file
-                            break
-                    
-                    my_server_url = "http://136.117.27.55:8000" 
-                    pdf_link = f"{my_server_url}/{upload_dir}/{matched_filename}"
-                    
-                    # AI 결과에 'Keywords'가 있다면 가져오고, 없다면 자격증 내용을 대신 씁니다.
-                    ai_keywords = item.get('Keywords') or item.get('keywords')
-                    certifications = item.get('Certification') or item.get('certification') or ""
-
-                    mix_target = [
-                        applicant_name,
-                        item.get('Job Roles') or item.get('job_role') or "",
-                        item.get('Degree') or item.get('degree') or "",
-                        item.get('Certification') or item.get('certification') or "",
-                        # AI가 준 키워드가 있다면 그것도 포함
-                        ", ".join(item.get('Keywords', [])) if isinstance(item.get('Keywords'), list) else (item.get('Keywords') or "")
-                    ]
-                    
-                    # 모든 텍스트를 공백으로 이어 붙임
-                    keywords_str = " ".join([str(x) for x in mix_target if x])
-
-                    applicant = dbmodels.Applicant(
-                        job_id=db_job.id,
-                        
-                        # ★ [핵심 수정] AI가 준 'Rank`' 대신, 우리가 센 순서(index)를 넣습니다.
-                        rank=index,  
-                        
-                        name=item.get('Name') or item.get('name'),
-                        score=(item.get('Score') or item.get('score') or 0) * 100,
-                        job_role=item.get('Job Roles') or item.get('job_role'),
-                        education=item.get('Degree') or item.get('degree'),
-                        certification=item.get('Certification') or item.get('certification'),
-                        resume_summary=safe_resume, 
-                        pdf_url=pdf_link,
-                        keywords=keywords_str    
-                    )
-                    db.add(applicant)
-                
-                db_job.status = "COMPLETED"
-                db_job.progress = 100
-                db_job.total_count = total_applicants_count                
-                db.add(db_job)
-                db.commit()
-                db.refresh(db_job)
-                return db_job
-            
+            # AI가 list 또는 dict(data/results)로 줄 수 있음 → 그대로 추출
+            if isinstance(ai_json, list):
+                ai_results = ai_json
+            elif isinstance(ai_json, dict):
+                ai_results = (
+                    ai_json.get("data")
+                    or ai_json.get("results")
+                    or []
+                )
             else:
-                error_msg = response.text
-                print(f"🚨 AI 서버 거절: {error_msg}")
-                raise HTTPException(status_code=500, detail=f"AI Error: {error_msg}")
-                
+                ai_results = []
+
+            
+            final_results = ai_results
+
+            total_applicants_count = len(final_results)
+
+            # 5) DB 저장 (AI JSON 그대로 사용!)
+            for index, item in enumerate(final_results, 1):
+                if not isinstance(item, dict):
+                    continue
+
+                # key 이름: AI가 주는 그대로 사용
+                name = item.get("Name") or item.get("name") or "Unknown"
+                job_role = item.get("Job Role") or item.get("Job Roles") or item.get("job_role")
+                degree_val = item.get("Degree") or item.get("degree")
+                certification_val = item.get("Certification") or item.get("certification")
+                score_val = item.get("Score") or item.get("score") or 0
+                keywords_val = item.get("Keywords") or item.get("keywords") or ""
+                resume_val = item.get("Resume") or item.get("resume") or ""
+
+                # 너무 길면 요약 (DB 오류 방지)
+                safe_resume = resume_val[:5000]
+
+                # 파일 매칭
+                matched_filename = f"{name}.pdf"
+                for local_file in saved_filenames:
+                    if name.lower().replace(" ", "") in local_file.lower().replace(" ", ""):
+                        matched_filename = local_file
+                        break
+
+                pdf_link = f"http://136.117.27.55:8000/{upload_dir}/{matched_filename}"
+
+                db_applicant = dbmodels.Applicant(
+                    job_id=db_job.id,
+                    rank=index,
+                    name=name,
+                    score=score_val,          
+                    job_role=job_role,
+                    education=degree_val,
+                    certification=certification_val,
+                    resume_summary=safe_resume,
+                    pdf_url=pdf_link,
+                    keywords=keywords_val     
+                )
+
+                db.add(db_applicant)
+
+            db_job.status = "COMPLETED"
+            db_job.progress = 100
+            db_job.total_count = total_applicants_count
+            db.add(db_job)
+            db.commit()
+            db.refresh(db_job)
+            return db_job
+
     except Exception as e:
-        print("=== 🚨 시스템 에러 발생 ===")
         traceback.print_exc()
         db_job.status = "FAILED"
         db.add(db_job)
         db.commit()
         raise HTTPException(status_code=500, detail=str(e))
-
-
-@router.get("/{id}/stats")
-def get_stats(id: int, db: Session = Depends(get_db)):
-    stats = crud.get_analysis_stats(db, job_id=id)
-    if not stats:
-        raise HTTPException(status_code=404, detail="Stats not found")
-    return stats
-
-@router.get("/{id}/applicants", response_model=List[schemas.Applicant])
-def get_applicants(id: int, db: Session = Depends(get_db)):
-    applicants = crud.get_applicants(db, job_id=id)
-    return applicants
-
-@router.get("/applicants/{id}", response_model=schemas.Applicant)
-def get_applicant_detail(id: int, db: Session = Depends(get_db)):
-    applicant = crud.get_applicant_detail(db, applicant_id=id)
-    if not applicant:
-        raise HTTPException(status_code=404, detail="Applicant not found")
-    return applicant
-
-# 5. 사용자의 모든 분석 기록 조회 (History)
-@router.get("/history/all", response_model=List[schemas.AnalysisJob])
-def get_analysis_history(
-    skip: int = 0, 
-    limit: int = 100, 
-    db: Session = Depends(get_db),
-    current_user: schemas.User = Depends(get_current_user)
-):
-    # owner_id == current_user.id인 AnalysisJob들 조회
-    jobs = db.query(dbmodels.AnalysisJob)\
-             .filter(dbmodels.AnalysisJob.owner_id == current_user.id)\
-             .order_by(dbmodels.AnalysisJob.created_at.desc())\
-             .offset(skip)\
-             .limit(limit)\
-             .all()
-    return jobs
-
-# 6. 특정 분석 작업의 메타데이터 조회 (전체 인원수 등)
-@router.get("/{id}", response_model=schemas.AnalysisJob)
-def get_analysis_job(id: int, db: Session = Depends(get_db)):
-    job = db.query(dbmodels.AnalysisJob).filter(dbmodels.AnalysisJob.id == id).first()
-    if not job:
-        raise HTTPException(status_code=404, detail="Job not found")
-    return job
-

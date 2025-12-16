@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-// 템플릿 파일 경로는 대소문자를 구분하므로 'Template.jsx'로 가정합니다.
 import Template from "../components/Template";
-import { loginUser } from "../api"; // ★ API 함수 import
+import { loginUser } from "../api"; // API 함수 import
 
 export default function LoginPage({ onLogin }) {
   const [email, setEmail] = useState("");
@@ -35,8 +34,7 @@ const handleLoginSubmit = async (e) => {
 
   return (
     <Template>
-      {/* Template 컴포넌트가 <div className="min-h-screen bg-white"> ... </div>
-        와 같이 흰색 배경을 제공한다고 가정합니다.
+      {/* 
       */}
       
       {/* 1. 로고 (절대 위치) - 새 디자인 적용 */}

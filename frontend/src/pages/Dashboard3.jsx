@@ -1,16 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-// VS Code 환경을 기준으로, 표준 React 컴포넌트 경로(대문자)로 수정합니다.
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
 import { fetchApplicantDetail } from '../api';
 
-// ★ [추가 1] React-PDF 라이브러리 및 스타일
+//  React-PDF 라이브러리 및 스타일
 import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 
-// ★ [추가 2] PDF Worker 설정 (필수)
+// PDF Worker 설정 (필수)
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 /**
@@ -21,7 +20,7 @@ export default function Dashboard3({ isLoggedIn, currentUser, onLogout }) {
   const [applicant, setApplicant] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // ★ [추가 3] PDF 페이지 수 상태 관리
+  // PDF 페이지 수 상태 관리
   const [numPages, setNumPages] = useState(null);
 
     useEffect(() => {
@@ -41,18 +40,18 @@ export default function Dashboard3({ isLoggedIn, currentUser, onLogout }) {
     fetchApplicant();
   }, [id]);
 
-  // ★ [추가 4] PDF 로드 성공 시 페이지 수 설정 함수
+  //  PDF 로드 성공 시 페이지 수 설정 함수
   function onDocumentLoadSuccess({ numPages }) {
     setNumPages(numPages);
   }
 
-// ★ [핵심] 하이라이트 로직 (Custom Text Renderer)
+// 하이라이트 로직 (Custom Text Renderer)
   const highlightPattern = (textItem) => {
     console.log("TextRenderer 실행중:", textItem.str);    
     // 1. applicant 데이터가 없으면 리턴
     if (!applicant) return textItem.str;
-    // 1. 요청하신 4가지 필드(직무, 학력, 자격증, 요약)의 값을 모두 가져옵니다.
-    // 데이터 키값의 대소문자 가능성을 모두 고려해 안전하게 가져옵니다.
+    // 1. 4가지 필드(직무, 학력, 자격증, 요약)의 값을 모두 가져옵
+    // 데이터 키값의 대소문자 가능성을 모두 고려해 안전하게 가져오기
     const targetValues = [
       applicant.job_role || applicant.Job_Roles,
       applicant.education || applicant.Education,
@@ -60,12 +59,12 @@ export default function Dashboard3({ isLoggedIn, currentUser, onLogout }) {
       applicant.resume_summary || applicant.Resume
     ];
 
-    // 2. 값들을 하나의 긴 문자열로 합칩니다. (null이나 빈 값 제거)
+    // 2. 값들을 하나의 긴 문자열로 합침 (null이나 빈 값 제거)
     const combinedText = targetValues
       .filter(val => val && typeof val === 'string' && val.trim() !== '')
       .join(" ");
 
-    // 3. 텍스트를 단어 단위로 쪼개고 정제합니다.
+    // 3. 텍스트를 단어 단위로 쪼개고 정제
     // - 공백, 줄바꿈(\n), 콤마 등으로 분리
     // - 2글자 이하의 너무 흔한 단어(a, is, of 등)는 하이라이트 노이즈가 되므로 제외
     const keywords = combinedText
@@ -80,7 +79,7 @@ export default function Dashboard3({ isLoggedIn, currentUser, onLogout }) {
 
     try {
       // 4. 정규식 생성 (특수문자 이스케이프 처리)
-      // 대소문자 구분 없이(gi) 찾습니다.
+      // 대소문자 구분 없이 매칭
       const escapedKeywords = uniqueKeywords.map(k => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
       const regex = new RegExp(`(${escapedKeywords.join('|')})`, 'gi');
 
@@ -126,7 +125,7 @@ export default function Dashboard3({ isLoggedIn, currentUser, onLogout }) {
     );
   }
 
-  // ★ 데이터 안전하게 꺼내기 (대문자/소문자 모두 대응)
+  // 데이터 안전하게 꺼내기 (대문자/소문자 모두 대응)
   const name = applicant.Job_Applicant_Name || applicant.name || "이름 없음";
   const jobRole = applicant.Job_Roles || applicant.job_role || "";
   const score = applicant.Score || applicant.score || 0;

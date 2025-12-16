@@ -27,7 +27,7 @@ export default function App() {
   const [currentUser, setCurrentUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true); // 초기 로딩 상태 추가
 
-  // ★ 앱 실행 시 로컬 스토리지에서 토큰 확인 (로그인 유지)
+  // 앱 실행 시 로컬 스토리지에서 토큰 확인 (로그인 유지)
   useEffect(() => {
     const token = localStorage.getItem("access_token");
     const storedUser = localStorage.getItem("user_info");

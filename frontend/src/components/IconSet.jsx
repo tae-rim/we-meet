@@ -33,7 +33,6 @@ export const PlusIcon = (props) => {
 };
 
 /**
- * 플러스 아이콘 SVG를 React 컴포넌트로 래핑합니다.
  * @param {object} props - SVG에 전달할 props (예: className)
  */
 export const FileIcon = (props) => {
@@ -41,7 +40,6 @@ export const FileIcon = (props) => {
 };
 
 /**
- * 플러스 아이콘 SVG를 React 컴포넌트로 래핑합니다.
  * @param {object} props - SVG에 전달할 props (예: className)
  */
 export const XIcon = (props) => {
@@ -49,7 +47,6 @@ export const XIcon = (props) => {
 };
 
 /**
- * 플러스 아이콘 SVG를 React 컴포넌트로 래핑합니다.
  * @param {object} props - SVG에 전달할 props (예: className)
  */
 export const AnalysisIcon = (props) => {
@@ -57,7 +54,6 @@ export const AnalysisIcon = (props) => {
 };
 
 /**
- * 플러스 아이콘 SVG를 React 컴포넌트로 래핑합니다.
  * @param {object} props - SVG에 전달할 props (예: className)
  */
 export const UserIcon = (props) => {
@@ -65,7 +61,6 @@ export const UserIcon = (props) => {
 };
 
 /**
- * 플러스 아이콘 SVG를 React 컴포넌트로 래핑합니다.
  * @param {object} props - SVG에 전달할 props (예: className)
  */
 export const ArchiveIcon = (props) => {
@@ -73,7 +68,6 @@ export const ArchiveIcon = (props) => {
 };
 
 /**
- * 플러스 아이콘 SVG를 React 컴포넌트로 래핑합니다.
  * @param {object} props - SVG에 전달할 props (예: className)
  */
 export const SendIcon = (props) => {
@@ -81,7 +75,6 @@ export const SendIcon = (props) => {
 };
 
 /**
- * 플러스 아이콘 SVG를 React 컴포넌트로 래핑합니다.
  * @param {object} props - SVG에 전달할 props (예: className)
  */
 export const CircleIcon = (props) => {
@@ -89,7 +82,7 @@ export const CircleIcon = (props) => {
 };
 
 /**
- * 플러스 아이콘 SVG를 React 컴포넌트로 래핑합니다.
+
  * @param {object} props - SVG에 전달할 props (예: className)
  */
 export const ArrowIcon = (props) => {

@@ -6,8 +6,7 @@ import resume01 from '../assets/data/RESUME01.hwpx';
 import resume02 from '../assets/data/RESUME02.hwpx';
 import resume03 from '../assets/data/RESUME03.docx';
 
-// 2. 이미지 파일 Import (확장자가 .png가 아니라면 .jpg 등으로 변경해주세요)
-// 경로: src/assets/images/ 안에 파일이 있어야 합니다.
+// 2. 이미지 파일 Import 
 import resumeImg01 from '../assets/images/resume_preview01.png';
 import resumeImg02 from '../assets/images/resume_preview02.png';
 import resumeImg03 from '../assets/images/resume_preview03.png';

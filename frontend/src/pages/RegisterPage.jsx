@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-// 템플릿이 있다면 사용하고, 없다면 div로 감쌉니다.
 import Template from "../components/Template"; 
 import { registerUser } from "../api";
 
